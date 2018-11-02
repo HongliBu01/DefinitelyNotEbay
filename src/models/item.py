@@ -17,7 +17,7 @@ class ItemSchema(Schema):
     quantity = fields.Integer()
     report_flag = fields.Boolean()
 
-    start_time = fields.DateTime()
+    start_time = fields.DateTime(default=datetime.now())
     end_time = fields.DateTime()
 
     bid_history = fields.List(fields.Nested(BidSchema))
