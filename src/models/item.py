@@ -24,3 +24,7 @@ class ItemSchema(Schema):
 
     shipping_cost = fields.Float()
     description = fields.Str()
+
+
+items_schema = ItemSchema(many=True)
+item_schema = ItemSchema()

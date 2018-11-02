@@ -9,3 +9,7 @@ class BidSchema(Schema):
     item_id = fields.Str()
     bid_amount = fields.Float()
     timestamp = fields.DateTime(default=datetime.now())
+
+
+bids_schema = BidSchema(many=True)
+bid_schema = BidSchema()
