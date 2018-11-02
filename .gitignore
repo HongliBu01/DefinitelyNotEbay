@@ -206,3 +206,9 @@ Temporary Items
 
 
 # End of https://www.gitignore.io/api/osx
+.idea/DefinitelyNotEbay.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/workspace.xml
+.idea/vcs.xml
