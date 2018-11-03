@@ -6,7 +6,7 @@ import json
 import datetime
 import config
 from bson.objectid import ObjectId
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_pymongo import PyMongo
 
 class JSONEncoder(json.JSONEncoder):
@@ -29,6 +29,114 @@ mongo = PyMongo(app)
 @app.route("/")
 def index():
     return render_template('index.html')
+
+
+# USER STUFF
+@app.route('/users', methods=['GET'])
+def findAllUsers():
+    users = []
+    for user in mongo.db.users.find():
+        users.append(user)
+    return 'OK'
+
+
+@app.route("/users", methods=['POST'])
+def createUser():
+  userData = request.get_json(force=True)
+  mongo.db.users.insert_one(userData)
+  return 'OK'  
+
+
+@app.route('/users/<user_id>', methods=['GET', 'PUT', 'DELETE'])
+def handleUser(user_id):
+  
+  if request.method == 'GET':
+    user = mongo.db.users.find_one_or_404({"_id": ObjectId(user_id)})
+    print(user)
+    return "OK"
+  
+  if request.method == 'PUT':
+    newUser = request.get_json(force=True)
+    user = mongo.db.users.find_one_and_update({"_id": ObjectId(user_id)}, {"$set": newUser})
+    return 'OK'
+
+  if request.method == 'DELETE':
+    mongo.db.users.delete_one({"_id": ObjectId(user_id)})
+    return 'OK'
+
+
+# ITEM STUFF
+@app.route("/items", methods=['GET'])
+def findAllItems():
+    items = []
+    for item in mongo.db.items.find():
+        items.append(item)
+    return 'OK'
+
+@app.route("/items", methods=['POST'])
+def createItem():
+    itemData = request.get_json(force=True)
+    mongo.db.items.insert_one(itemData)
+    return 'OK'
+
+@app.route("/items/<item_id>", methods=['GET', 'PUT', 'DELETE'])
+def handleItem(item_id):
+    if request.method == 'GET':
+        itemData = mongo.db.items.find_one_or_404({"_id": ObjectId(item_id)})
+        print(itemData)
+        return 'OK'
+
+    if request.method == 'PUT':
+      newItem = request.get_json(force=True)
+      item = mongo.db.items.find_one_and_update({"_id": ObjectId(item_id)}, {"$set": newItem})
+      return 'OK'
+
+    if request.method == 'DELETE':
+        mongo.db.items.delete_one({"_id": ObjectId(item_id)})
+        return 'OK'
+
+
+# BID STUFF
+@app.route('/items/<item_id>/bid', methods=['POST'])
+def bid(item_id):
+    new_bid = request.get_json(force=True)
+    item = mongo.db.items.find_one({"_id": ObjectId(item_id)})
+    item["bid_history"].append(new_bid)
+    mongo.db.items.find_one_and_update({"_id": ObjectId(item_id)}, {"$set": item})
+    return "OK"
+    
+  
+# CART STUFF
+@app.route('/users/<user_id>/cart', methods=['GET', 'POST'])
+def cart(user_id):
+    if request.method == 'GET':
+        cart = mongo.db.users.find_one({"_id": ObjectId(user_id)}).cart
+        return "OK"
+    
+    elif request.method == 'POST':
+        new_cart = request.get_json(force=True)
+        user = mongo.db.users.find_one({"_id": ObjectId(user_id)})
+        print(user)
+        user['cart'] = new_cart
+        mongo.db.users.find_one_and_update({"_id": ObjectId(user_id)}, {"$set": new_cart})
+        return "OK"
+        
+
+# WATCHLIST
+@app.route('/users/<user_id>/watchlist', methods=['GET', 'POST'])
+def watchlist(user_id):
+    if request.method == 'GET':
+        watchlist = mongo.db.users.find_one({"_id": ObjectId(user_id)}).watchlist
+        return "OK"
+    
+    elif request.method == 'POST':
+        new_watchlist = request.get_json(force=True)
+        user = mongo.db.users.find_one({"_id": ObjectId(user_id)})
+        user["watchlist"] = new_watchlist
+        mongo.db.users.find_one_and_update({"_id": ObjectId(user_id)}, {"$set": new_watchlist})
+        return "OK"
+
+
 
 
 if __name__ == "__main__":
