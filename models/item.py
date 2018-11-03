@@ -1,5 +1,5 @@
 from marshmallow import Schema, fields
-from src.models.bid import BidSchema
+from models.bid import BidSchema
 from datetime import datetime
 
 
