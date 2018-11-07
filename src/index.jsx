@@ -1,13 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Route, NavLink, BrowserRouter } from 'react-router-dom'
+import AddItem from './AddItem.jsx'
+import App from './App.jsx'
 
-
-class App extends React.Component {
+class Main extends React.Component {
     render() {
-        return (
-            <div>My Flask React App!</div>
-        );
+      return (
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      );
     }
 }
 
-ReactDOM.render(<App />, document.getElementById('app'));
+ReactDOM.render(<Main />, document.getElementById('app'));

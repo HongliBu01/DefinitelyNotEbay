@@ -6,6 +6,7 @@ import json
 import datetime
 import config
 from bson.objectid import ObjectId
+from bson import json_util
 from flask import Flask, render_template, request
 from flask_pymongo import PyMongo
 
@@ -44,17 +45,17 @@ def findAllUsers():
 def createUser():
   userData = request.get_json(force=True)
   mongo.db.users.insert_one(userData)
-  return 'OK'  
+  return 'OK'
 
 
 @app.route('/users/<user_id>', methods=['GET', 'PUT', 'DELETE'])
 def handleUser(user_id):
-  
+
   if request.method == 'GET':
     user = mongo.db.users.find_one_or_404({"_id": ObjectId(user_id)})
     print(user)
     return "OK"
-  
+
   if request.method == 'PUT':
     newUser = request.get_json(force=True)
     user = mongo.db.users.find_one_and_update({"_id": ObjectId(user_id)}, {"$set": newUser})
@@ -71,13 +72,13 @@ def findAllItems():
     items = []
     for item in mongo.db.items.find():
         items.append(item)
-    return 'OK'
+    return json.dumps(items, default=json_util.default)
 
 @app.route("/items", methods=['POST'])
 def createItem():
     itemData = request.get_json(force=True)
     mongo.db.items.insert_one(itemData)
-    return 'OK'
+    return json.dumps(itemData, default=json_util.default)
 
 @app.route("/items/<item_id>", methods=['GET', 'PUT', 'DELETE'])
 def handleItem(item_id):
@@ -104,15 +105,15 @@ def bid(item_id):
     item["bid_history"].append(new_bid)
     mongo.db.items.find_one_and_update({"_id": ObjectId(item_id)}, {"$set": item})
     return "OK"
-    
-  
+
+
 # CART STUFF
 @app.route('/users/<user_id>/cart', methods=['GET', 'POST'])
 def cart(user_id):
     if request.method == 'GET':
         cart = mongo.db.users.find_one({"_id": ObjectId(user_id)}).cart
         return "OK"
-    
+
     elif request.method == 'POST':
         new_cart = request.get_json(force=True)
         user = mongo.db.users.find_one({"_id": ObjectId(user_id)})
@@ -120,7 +121,7 @@ def cart(user_id):
         user['cart'] = new_cart
         mongo.db.users.find_one_and_update({"_id": ObjectId(user_id)}, {"$set": new_cart})
         return "OK"
-        
+
 
 # WATCHLIST
 @app.route('/users/<user_id>/watchlist', methods=['GET', 'POST'])
@@ -128,7 +129,7 @@ def watchlist(user_id):
     if request.method == 'GET':
         watchlist = mongo.db.users.find_one({"_id": ObjectId(user_id)}).watchlist
         return "OK"
-    
+
     elif request.method == 'POST':
         new_watchlist = request.get_json(force=True)
         user = mongo.db.users.find_one({"_id": ObjectId(user_id)})
@@ -140,4 +141,4 @@ def watchlist(user_id):
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=os.environ.get('PORT', 3000))
+    app.run(host='0.0.0.0', port=os.environ.get('PORT', 3000), debug=True)
