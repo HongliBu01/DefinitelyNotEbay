@@ -9,8 +9,11 @@ from bson.objectid import ObjectId
 from flask import Flask, render_template, request
 from flask_pymongo import PyMongo
 
+
 class JSONEncoder(json.JSONEncoder):
-    ''' extend json-encoder class'''
+    '''
+    extend json-encoder class
+    '''
 
     def default(self, o):
         if isinstance(o, ObjectId):
@@ -18,6 +21,7 @@ class JSONEncoder(json.JSONEncoder):
         if isinstance(o, datetime.datetime):
             return str(o)
         return json.JSONEncoder.default(self, o)
+
 
 app = Flask(__name__)
 
@@ -31,7 +35,6 @@ def index():
     return render_template('index.html')
 
 
-# USER STUFF
 @app.route('/users', methods=['GET'])
 def findAllUsers():
     users = []
@@ -135,8 +138,6 @@ def watchlist(user_id):
         user["watchlist"] = new_watchlist
         mongo.db.users.find_one_and_update({"_id": ObjectId(user_id)}, {"$set": new_watchlist})
         return "OK"
-
-
 
 
 if __name__ == "__main__":
