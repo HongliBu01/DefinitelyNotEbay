@@ -5,7 +5,7 @@ class MainPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      allItems = [],
+      allItems: [],
     };
     this.getItems = this.getItems.bind(this);
   }
@@ -15,24 +15,21 @@ class MainPage extends React.Component {
   }
 
   getItems() {
-    fetch('/items').then(
-      results => {
-        console.log(results)
+    fetch('/items')
+      .then(results => {
         return results.json()
-      }).then(
-        data => {
+      }).then(data => {
           console.log(data)
           this.setState({allItems: data})
-        });
+      });
   }
-
 
   render() {
     return (
       <div>
       <h1>THIS IS MAIN PAGE</h1>
       <ul>
-        {console.log(this.state.data)}
+        {this.state.allItems.map(item => <li> {item.name || "Unnamed"}</li>)}
       </ul>
       </div>
     )
