@@ -3,11 +3,12 @@ import { Route, NavLink } from 'react-router-dom'
 import PrimarySearchAppBar from './NavBar.jsx';
 import AddItem from './AddItem.jsx'
 import MainPage from './MainPage.jsx'
+import Profile from './Profile.jsx'
 
 class App extends React.Component {
   render() {
     return (
-      <div id="dashboard">
+      <div>
         <PrimarySearchAppBar/>
         <div className="menu">
           <NavLink exact to="/">
@@ -20,6 +21,7 @@ class App extends React.Component {
         <div className="content">
           <Route exact path="/" component={MainPage} />
           <Route exact path="/addItem" component={AddItem} />
+          <Route exact path="/profile" component={Profile} />
         </div>
       </div>
     )
