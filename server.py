@@ -38,7 +38,7 @@ def findAllUsers():
     users = []
     for user in mongo.db.users.find():
         users.append(user)
-    return 'OK'
+    return json.dumps(users, default=json_util.default)
 
 
 @app.route("/users", methods=['POST'])
@@ -53,8 +53,7 @@ def handleUser(user_id):
 
   if request.method == 'GET':
     user = mongo.db.users.find_one_or_404({"_id": ObjectId(user_id)})
-    print(user)
-    return "OK"
+    return json.dumps(user, default=json_util.default)
 
   if request.method == 'PUT':
     newUser = request.get_json(force=True)
@@ -84,8 +83,7 @@ def createItem():
 def handleItem(item_id):
     if request.method == 'GET':
         itemData = mongo.db.items.find_one_or_404({"_id": ObjectId(item_id)})
-        print(itemData)
-        return 'OK'
+        return json.dumps(itemData, default=json_util.default)
 
     if request.method == 'PUT':
       newItem = request.get_json(force=True)
@@ -111,8 +109,9 @@ def bid(item_id):
 @app.route('/users/<user_id>/cart', methods=['GET', 'POST'])
 def cart(user_id):
     if request.method == 'GET':
-        cart = mongo.db.users.find_one({"_id": ObjectId(user_id)}).cart
-        return "OK"
+        cart = mongo.db.users.find_one({"_id": ObjectId(user_id)})['cart']
+        print(cart)
+        return json.dumps(cart, default=json_util.default)
 
     elif request.method == 'POST':
         new_cart = request.get_json(force=True)
@@ -127,8 +126,8 @@ def cart(user_id):
 @app.route('/users/<user_id>/watchlist', methods=['GET', 'POST'])
 def watchlist(user_id):
     if request.method == 'GET':
-        watchlist = mongo.db.users.find_one({"_id": ObjectId(user_id)}).watchlist
-        return "OK"
+        watchlist = mongo.db.users.find_one({"_id": ObjectId(user_id)})['watchlist']
+        return json.dumps(watchlist, default=json_util.default)
 
     elif request.method == 'POST':
         new_watchlist = request.get_json(force=True)
