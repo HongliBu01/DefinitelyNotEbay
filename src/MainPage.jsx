@@ -73,15 +73,15 @@ class MainPage extends React.Component {
       </ul>
       <h3>These are users</h3>
       <ul>
-        {this.state.allUsers.map(user => <li> {user.name || "nullitem"}</li>)}
+        {this.state.allUsers.map((user, i) => <li key={`user_${i}`}> {user.name || "nullitem"}</li>)}
       </ul>
       <h3>This is the cart</h3>
       <ul>
-        {this.state.cartItems.map(item => <li> {item.name || "nullitem"}</li>)}
+        {this.state.cartItems.map((item, i) => <li key={`cart_${i}`}> {item.name || "nullitem"}</li>)}
       </ul>
       <h3>This is the watchlist</h3>
       <ul>
-        {this.state.watchlistItems.map(item => <li> {item.name || "nullitem"}</li>)}
+        {this.state.watchlistItems.map((item, i) => <li key={`watch_${i}`}> {item.name || "nullitem"}</li>)}
       </ul>
       </div>
     )
