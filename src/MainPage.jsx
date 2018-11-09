@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom';
+import {withRouter} from 'react-router'
 
 class MainPage extends React.Component {
   constructor(props) {
@@ -29,10 +30,10 @@ class MainPage extends React.Component {
       <div>
       <h1>THIS IS MAIN PAGE</h1>
       <ul>
-        {this.state.allItems.map(item => <li> {item.name || "Unnamed"}</li>)}
+        {this.state.allItems.map((item, i) => <li key={i}> {item.name || "Unnamed"}</li>)}
       </ul>
       </div>
     )
   }
 }
-export default MainPage
+export default withRouter(MainPage)

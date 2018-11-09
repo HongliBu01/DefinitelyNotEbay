@@ -137,6 +137,9 @@ def watchlist(user_id):
         mongo.db.users.find_one_and_update({"_id": ObjectId(user_id)}, {"$set": new_watchlist})
         return "OK"
 
+@app.route('/<path:path>')
+def catch_all(path):
+    return render_template('index.html')
 
 
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, NavLink } from 'react-router-dom'
+import { Route, Switch } from 'react-router-dom'
 import PrimarySearchAppBar from './NavBar.jsx';
 import AddItem from './AddItem.jsx'
 import MainPage from './MainPage.jsx'
@@ -10,19 +10,11 @@ class App extends React.Component {
     return (
       <div>
         <PrimarySearchAppBar/>
-        <div className="menu">
-          <NavLink exact to="/">
-              Home
-          </NavLink>
-          <NavLink exact to="/addItem">
-              Add Item
-          </NavLink>
-        </div>
-        <div className="content">
+        <Switch>
           <Route exact path="/" component={MainPage} />
-          <Route exact path="/addItem" component={AddItem} />
-          <Route exact path="/profile" component={Profile} />
-        </div>
+          <Route path="/addItem" component={AddItem} />
+          <Route path="/profile" component={Profile} />
+        </Switch>
       </div>
     )
   }
