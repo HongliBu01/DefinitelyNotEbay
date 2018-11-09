@@ -1,6 +1,7 @@
 import React from 'react'
-import ReactDOM from 'react-dom';
-import {withRouter} from 'react-router'
+import ReactDOM from 'react-dom'
+import { withRouter } from 'react-router'
+import { Link } from 'react-router-dom'
 
 class MainPage extends React.Component {
   constructor(props) {
@@ -25,7 +26,7 @@ class MainPage extends React.Component {
   }
 
   getItems() {
-    fetch('/items')
+    fetch('/api/items')
       .then(results => {
         return results.json()
       }).then(data => {
@@ -35,7 +36,7 @@ class MainPage extends React.Component {
   }
 
   getUsers() {
-    fetch('/users')
+    fetch('/api/users')
       .then(results => {
         return results.json()
       }).then(data => {
@@ -45,7 +46,7 @@ class MainPage extends React.Component {
   }
 
   getCart() {
-    fetch('/users/5bdd060508ffae36201e3a79/cart') // TODO: URL Parsing, get correct userID
+    fetch('/api/users/5bdd060508ffae36201e3a79/cart') // TODO: URL Parsing, get correct userID
       .then(results => {
         return results.json()
       }).then(data => {
@@ -55,7 +56,7 @@ class MainPage extends React.Component {
   }
 
   getWatchlist() {
-    fetch('/users/5bdd060508ffae36201e3a79/cart') // TODO: URL Parsing
+    fetch('/api/users/5bdd060508ffae36201e3a79/cart') // TODO: URL Parsing
       .then(results => {
         return results.json()
       }).then(data => {
@@ -63,13 +64,13 @@ class MainPage extends React.Component {
         this.setState({watchlistItems: data})
       })
   }
-
+//{`/item/${item._id.$oid ? item._id.$oid : item._id}`}
   render() {
     return (
       <div>
       <h1>THIS IS MAIN PAGE</h1>
       <ul>
-        {this.state.allItems.map((item, i) => <li key={i}> {item.name || "Unnamed"}</li>)}
+        {this.state.allItems.map((item, i) => <li key={i}> {item.name || "Unnamed"} <Link to={`/item/${item._id.$oid ? item._id.$oid : item._id}`}>Link</Link> </li>)}
       </ul>
       <h3>These are users</h3>
       <ul>

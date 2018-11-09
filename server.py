@@ -33,7 +33,7 @@ def index():
 
 
 # USER STUFF
-@app.route('/users', methods=['GET'])
+@app.route('/api/users', methods=['GET'])
 def findAllUsers():
     users = []
     for user in mongo.db.users.find():
@@ -41,14 +41,14 @@ def findAllUsers():
     return json.dumps(users, default=json_util.default)
 
 
-@app.route("/users", methods=['POST'])
+@app.route("/api/users", methods=['POST'])
 def createUser():
   userData = request.get_json(force=True)
   mongo.db.users.insert_one(userData)
   return 'OK'
 
 
-@app.route('/users/<user_id>', methods=['GET', 'PUT', 'DELETE'])
+@app.route('/api/users/<user_id>', methods=['GET', 'PUT', 'DELETE'])
 def handleUser(user_id):
 
   if request.method == 'GET':
@@ -66,20 +66,20 @@ def handleUser(user_id):
 
 
 # ITEM STUFF
-@app.route("/items", methods=['GET'])
+@app.route("/api/items", methods=['GET'])
 def findAllItems():
     items = []
     for item in mongo.db.items.find():
         items.append(item)
     return json.dumps(items, default=json_util.default)
 
-@app.route("/items", methods=['POST'])
+@app.route("/api/items", methods=['POST'])
 def createItem():
     itemData = request.get_json(force=True)
     mongo.db.items.insert_one(itemData)
     return json.dumps(itemData, default=json_util.default)
 
-@app.route("/items/<item_id>", methods=['GET', 'PUT', 'DELETE'])
+@app.route("/api/items/<item_id>", methods=['GET', 'PUT', 'DELETE'])
 def handleItem(item_id):
     if request.method == 'GET':
         itemData = mongo.db.items.find_one_or_404({"_id": ObjectId(item_id)})
@@ -96,7 +96,7 @@ def handleItem(item_id):
 
 
 # BID STUFF
-@app.route('/items/<item_id>/bid', methods=['POST'])
+@app.route('/api/items/<item_id>/bid', methods=['POST'])
 def bid(item_id):
     new_bid = request.get_json(force=True)
     item = mongo.db.items.find_one({"_id": ObjectId(item_id)})
@@ -106,7 +106,7 @@ def bid(item_id):
 
 
 # CART STUFF
-@app.route('/users/<user_id>/cart', methods=['GET', 'POST'])
+@app.route('/api/users/<user_id>/cart', methods=['GET', 'POST'])
 def cart(user_id):
     if request.method == 'GET':
         cart = mongo.db.users.find_one({"_id": ObjectId(user_id)})['cart']
@@ -123,7 +123,7 @@ def cart(user_id):
 
 
 # WATCHLIST
-@app.route('/users/<user_id>/watchlist', methods=['GET', 'POST'])
+@app.route('/api/users/<user_id>/watchlist', methods=['GET', 'POST'])
 def watchlist(user_id):
     if request.method == 'GET':
         watchlist = mongo.db.users.find_one({"_id": ObjectId(user_id)})['watchlist']

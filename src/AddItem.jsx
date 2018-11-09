@@ -53,7 +53,7 @@ class AddItem extends React.Component {
     for (var i = 0; i < categories.length; i++) {
       categories[i] = categories[i].trim()
     }
-    fetch('/items', {
+    fetch('/api/items', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
