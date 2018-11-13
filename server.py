@@ -100,9 +100,12 @@ def handleItem(item_id):
 def bid(item_id):
     new_bid = request.get_json(force=True)
     item = mongo.db.items.find_one({"_id": ObjectId(item_id)})
-    item["bid_history"].append(new_bid)
+    if "bid_history" not in item:
+        item["bid_history"] = [new_bid]
+    else:
+        item["bid_history"].append(new_bid)
     mongo.db.items.find_one_and_update({"_id": ObjectId(item_id)}, {"$set": item})
-    return "OK"
+    return json.dumps(new_bid, default=json_util.default)
 
 
 # CART STUFF
