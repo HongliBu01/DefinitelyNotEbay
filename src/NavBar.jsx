@@ -1,9 +1,6 @@
 import React from 'react';
-<<<<<<< HEAD
-import { NavLink } from 'react-router-dom'
-=======
+
 import { Link } from 'react-router-dom'
->>>>>>> master
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
@@ -134,11 +131,7 @@ class PrimarySearchAppBar extends React.Component {
         open={isMenuOpen}
         onClose={this.handleMenuClose}
       >
-<<<<<<< HEAD
-        <MenuItem onClick={this.handleMenuClose}><NavLink exact to="/profile">Profile</NavLink></MenuItem>
-=======
         <MenuItem onClick={this.handleMenuClose}><Link exact to="/profile" style={{ textDecoration: 'none' }}>Profile</Link></MenuItem>
->>>>>>> master
         <MenuItem onClick={this.handleMenuClose}>My account</MenuItem>
       </Menu>
     );
