@@ -1,5 +1,9 @@
 import React from 'react';
+<<<<<<< HEAD
 import { NavLink } from 'react-router-dom'
+=======
+import { Link } from 'react-router-dom'
+>>>>>>> master
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
@@ -15,6 +19,9 @@ import SearchIcon from '@material-ui/icons/Search';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import MailIcon from '@material-ui/icons/Mail';
 import NotificationsIcon from '@material-ui/icons/Notifications';
+import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
+import HomeIcon from '@material-ui/icons/Home';
+import AddBoxIcon from '@material-ui/icons/AddBox';
 import MoreIcon from '@material-ui/icons/MoreVert';
 
 const styles = theme => ({
@@ -59,6 +66,7 @@ const styles = theme => ({
     justifyContent: 'center',
   },
   inputRoot: {
+    color: 'inherit',
     width: '100%',
   },
   inputInput: {
@@ -126,7 +134,11 @@ class PrimarySearchAppBar extends React.Component {
         open={isMenuOpen}
         onClose={this.handleMenuClose}
       >
+<<<<<<< HEAD
         <MenuItem onClick={this.handleMenuClose}><NavLink exact to="/profile">Profile</NavLink></MenuItem>
+=======
+        <MenuItem onClick={this.handleMenuClose}><Link exact to="/profile" style={{ textDecoration: 'none' }}>Profile</Link></MenuItem>
+>>>>>>> master
         <MenuItem onClick={this.handleMenuClose}>My account</MenuItem>
       </Menu>
     );
@@ -139,6 +151,24 @@ class PrimarySearchAppBar extends React.Component {
         open={isMobileMenuOpen}
         onClose={this.handleMobileMenuClose}
       >
+        <Link exact to="/" style={{ textDecoration: 'none' }}><MenuItem>
+          <IconButton>
+            <HomeIcon />
+          </IconButton>
+          <p>Main Page</p>
+        </MenuItem></Link>
+        <Link exact to="/addItem" style={{ textDecoration: 'none' }}><MenuItem>
+          <IconButton>
+            <AddBoxIcon />
+          </IconButton>
+          <p>Sell Item</p>
+        </MenuItem></Link>
+        <MenuItem>
+          <IconButton>
+            <ShoppingCartIcon />
+          </IconButton>
+          <p>Shopping Cart</p>
+        </MenuItem>
         <MenuItem>
           <IconButton>
             <Badge badgeContent={11} color="secondary">
@@ -147,25 +177,25 @@ class PrimarySearchAppBar extends React.Component {
           </IconButton>
           <p>Notifications</p>
         </MenuItem>
+        <Link exact to="/profile" style={{ textDecoration: 'none' }}>
         <MenuItem onClick={this.handleProfileMenuOpen}>
           <IconButton>
             <AccountCircle />
           </IconButton>
           <p>Profile</p>
-        </MenuItem>
+        </MenuItem></Link>
       </Menu>
     );
-
     return (
       <div className={classes.root}>
-        <AppBar position="static">
+        <AppBar position="static" style={{ backgroundColor: '#66b3ff' }}>
           <Toolbar>
-            <IconButton className={classes.menuButton} aria-label="Open drawer">
-              <MenuIcon />
-            </IconButton>
-            <Typography className={classes.title} variant="h6" noWrap>
-              Definitely Not eBay
-            </Typography>
+            <Link exact to="/" style={{ textDecoration: 'none' }}>
+              <Typography className={classes.title} variant="h6" noWrap>
+                Definitely Not eBay
+              </Typography>
+            </Link>
+
             <div className={classes.search}>
               <div className={classes.searchIcon}>
                 <SearchIcon />
@@ -180,8 +210,16 @@ class PrimarySearchAppBar extends React.Component {
             </div>
             <div className={classes.grow} />
             <div className={classes.sectionDesktop}>
+              <Link exact to="/addItem" style={{ textDecoration: 'none' }}>
+                <IconButton>
+                  <AddBoxIcon />
+                </IconButton>
+              </Link>
               <IconButton>
-                <Badge badgeContent={17} color="secondary">
+                <ShoppingCartIcon />
+              </IconButton>
+              <IconButton>
+                <Badge badgeContent={0} color="secondary">
                   <NotificationsIcon />
                 </Badge>
               </IconButton>
@@ -206,5 +244,10 @@ class PrimarySearchAppBar extends React.Component {
     );
   }
 }
+
+
+/*<IconButton className={classes.menuButton} aria-label="Open drawer">
+  <MenuIcon />
+</IconButton>*/
 
 export default withStyles(styles)(PrimarySearchAppBar);
