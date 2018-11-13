@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
+import moment from 'moment'
 
 // TODO: Set up button functionality
-// TODO: Handle time. Use moment
 class ItemPage extends React.Component {
   constructor(props) {
     super(props);
@@ -25,13 +25,18 @@ class ItemPage extends React.Component {
       bid: false,
       bidPrice: "",
       validBid: false,
-      bidHistory: []
+      bidHistory: [],
+      expired: false,
+      remainingTime: ""
     }
     this.getItem = this.getItem.bind(this)
     this.handleChange = this.handleChange.bind(this)
     this.toggleBid = this.toggleBid.bind(this)
     this.handleBid = this.handleBid.bind(this)
     this.handleBidChange = this.handleBidChange.bind(this)
+    this.addToCart = this.addToCart.bind(this)
+    this.addToWatchlist = this.addToWatchlist.bind(this)
+    this.reportItem = this.reportItem.bind(this)
   }
 
   componentWillMount() {
@@ -47,10 +52,16 @@ class ItemPage extends React.Component {
       }).then(data => {
         console.log("Input Data", data)
         this.setState({...data})
+        if (this.state.bidHistory.length > 0) {
+          this.setState({startingPrice: this.state.bidHistory[this.state.bidHistory.length-1]})
+        }
+        if (moment(Date.now()).isAfter(moment(this.state.endTime))) {
+          this.setState({expired: true})
+        } else {
+          const duration = moment.duration(moment(this.state.endTime).diff(moment(Date.now())))
+          this.setState({remainingTime: duration.humanize()})
+        }
     })
-    if (this.state.bidHistory.length > 0) {
-      this.setState({startingPrice: this.state.bidHistory[this.state.bidHistory.length-1]})
-    }
   }
 
   handleChange = name => event => {
@@ -92,15 +103,28 @@ class ItemPage extends React.Component {
     })
   }
 
+  addToCart() {
+
+  }
+
+  addToWatchlist() {
+
+  }
+
+  reportItem() {
+    // TODO. Need endpoint.
+    console.log("REPORT")
+  }
+
   render() {
     return (
       <div>
         <h1>{this.state.name}</h1>
         <p> Quantity: {this.state.quantity}</p>
-        <p> Time: {this.state.startTime} - {this.state.endTime} </p>
+        <p> Time Left: {this.state.expired ? "Auction has ended" : this.state.remainingTime} </p>
         <p> Bid Price: {this.state.startPrice} </p>
-        <Button variant="contained" onClick={()=>this.toggleBid()}> Bid </Button>
-        {this.state.bid ? <div><form autoComplete="off">
+        <Button variant="contained" onClick={()=>this.toggleBid()} disabled={this.state.expired}> Bid </Button>
+        {this.state.bid && !this.state.expired ? <div><form autoComplete="off">
         <TextField
             required
             label="Bid Amount"
@@ -128,6 +152,9 @@ class ItemPage extends React.Component {
         {this.state.description}
         <h4>Categories</h4>
         {this.state.categories}
+        <br />
+        <Button variant="contained">Add to Watchlist </Button>
+        <Button variant="contained">Report Item </Button>
       </div>
     )
   }
