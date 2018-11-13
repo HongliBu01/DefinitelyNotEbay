@@ -5,6 +5,7 @@ import AddItem from './AddItem.jsx'
 import MainPage from './MainPage.jsx'
 import Profile from './Profile.jsx'
 import ItemPage from './ItemPage.jsx'
+import WatchListPage from './WatchListPage.jsx'
 
 class App extends React.Component {
   render() {
@@ -16,6 +17,7 @@ class App extends React.Component {
           <Route path="/addItem" component={AddItem} />
           <Route path="/profile" component={Profile} />
           <Route path="/item/:id" component={ItemPage} />
+          <Route path="/users/:user_id/watchlist" component={WatchListPage} />
         </Switch>
       </div>
     )

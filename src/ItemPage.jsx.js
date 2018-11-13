@@ -104,15 +104,44 @@ class ItemPage extends React.Component {
   }
 
   addToCart() {
-
+    // DUMMY DATA
+    const userID = "5beb3c55d5e788ace8a79665"
+    fetch(`/api/users/${userID}/cart`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        _id: this.state.itemID
+      })
+    }).then(results => {
+      return results.json()
+    }).then(data => {
+        console.log(data)
+    })
   }
 
   addToWatchlist() {
-
+    //DUMMY
+    const userID = "5beb3c55d5e788ace8a79665"
+    fetch(`/api/users/${userID}/watchlist`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        _id: this.state.itemID
+      })
+    }).then(results => {
+      return results.json()
+    }).then(data => {
+        console.log(data)
+    })
   }
 
   reportItem() {
-    // TODO. Need endpoint.
     console.log("REPORT")
   }
 
@@ -146,15 +175,15 @@ class ItemPage extends React.Component {
         </form>
         <Button variant="contained" onClick={()=>this.handleBid()} disabled={!this.state.validBid}> Make Bid </Button>
         </div>: null}
-        {this.state.buyPrice !== "0.00" ? <div><p>Buy Price: ${this.state.buyPrice}</p><Button variant="contained"> Buy Now </Button></div> : ""}
+        {this.state.buyPrice !== "0.00" ? <div><p>Buy Price: ${this.state.buyPrice}</p><Button variant="contained" onClick={()=>this.addToCart()}> Buy Now </Button></div> : ""}
         <p> Shipping price: ${this.state.shippingPrice} </p>
         <h4>Description</h4>
         {this.state.description}
         <h4>Categories</h4>
         {this.state.categories}
         <br />
-        <Button variant="contained">Add to Watchlist </Button>
-        <Button variant="contained">Report Item </Button>
+        <Button variant="contained" onClick={()=>this.addToWatchlist()}>Add to Watchlist </Button>
+        <Button variant="contained" onClick={()=>this.reportItem()}>Report Item </Button>
       </div>
     )
   }

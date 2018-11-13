@@ -88,11 +88,11 @@ def handleItem(item_id):
     if request.method == 'PUT':
       newItem = request.get_json(force=True)
       item = mongo.db.items.find_one_and_update({"_id": ObjectId(item_id)}, {"$set": newItem})
-      return 'OK'
+      return json.dumps(item, default=json_util.default)
 
     if request.method == 'DELETE':
-        mongo.db.items.delete_one({"_id": ObjectId(item_id)})
-        return 'OK'
+        res = mongo.db.items.delete_one({"_id": ObjectId(item_id)})
+        return json.dumps(res, default=json_util.default)
 
 
 # BID STUFF
@@ -117,12 +117,14 @@ def cart(user_id):
         return json.dumps(cart, default=json_util.default)
 
     elif request.method == 'POST':
-        new_cart = request.get_json(force=True)
+        new_cart_item = request.get_json(force=True)
         user = mongo.db.users.find_one({"_id": ObjectId(user_id)})
-        print(user)
-        user['cart'] = new_cart
-        mongo.db.users.find_one_and_update({"_id": ObjectId(user_id)}, {"$set": new_cart})
-        return "OK"
+        if "cart" not in user:
+            user["cart"] = [new_cart_item]
+        else:
+            user["cart"].append(new_cart_item)
+        res = mongo.db.users.find_one_and_update({"_id": ObjectId(user_id)}, {"$set": {"cart": user["cart"]}})
+        return json.dumps(res, default=json_util.default)
 
 
 # WATCHLIST
@@ -133,11 +135,14 @@ def watchlist(user_id):
         return json.dumps(watchlist, default=json_util.default)
 
     elif request.method == 'POST':
-        new_watchlist = request.get_json(force=True)
+        new_watchlist_item = request.get_json(force=True)
         user = mongo.db.users.find_one({"_id": ObjectId(user_id)})
-        user["watchlist"] = new_watchlist
-        mongo.db.users.find_one_and_update({"_id": ObjectId(user_id)}, {"$set": new_watchlist})
-        return "OK"
+        if "watchlist" not in user:
+            user["watchlist"] = [new_watchlist_item]
+        else:
+            user["watchlist"].append(new_watchlist_item)
+        res = mongo.db.users.find_one_and_update({"_id": ObjectId(user_id)}, {"$set": {"watchlist": user["watchlist"]}})
+        return json.dumps(res, default=json_util.default)
 
 @app.route('/<path:path>')
 def catch_all(path):

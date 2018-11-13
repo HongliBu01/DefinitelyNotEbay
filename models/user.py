@@ -1,5 +1,5 @@
 from marshmallow import Schema, fields
-from src.models.item_list import ItemListSchema
+from models.item_list import ItemListSchema
 
 
 # user
