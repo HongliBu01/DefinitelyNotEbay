@@ -1,5 +1,16 @@
 from marshmallow import Schema, fields
-from src.models.item_list import ItemListSchema
+from models.item_list import ItemListSchema
+from flask_login import UserMixin
+from mongoengine import Document, EmailField, StringField, BooleanField, DateTimeField, ObjectIdField
+import datetime
+
+
+class User(Document, UserMixin):
+    _id = ObjectIdField(primary_key=True)
+    email = EmailField(unique=True)
+    password = StringField(default=True)
+    is_admin = BooleanField(default=False)
+    update_at = DateTimeField(default=datetime.datetime.now())
 
 
 # user
