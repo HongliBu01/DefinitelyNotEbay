@@ -151,14 +151,13 @@ class ItemPage extends React.Component {
         <h1>{this.state.name}</h1>
         <p> Quantity: {this.state.quantity}</p>
         <p> Time Left: {this.state.expired ? "Auction has ended" : this.state.remainingTime} </p>
-        <p> Bid Price: {this.state.startPrice} </p>
+        <p> Bid Price: ${this.state.startPrice} </p>
         <Button variant="contained" onClick={()=>this.toggleBid()} disabled={this.state.expired}> Bid </Button>
         {this.state.bid && !this.state.expired ? <div><form autoComplete="off">
         <TextField
             required
             label="Bid Amount"
             id="bid_price"
-            defaultValue="0.00"
             margin="dense"
             InputProps={{
             startAdornment: (

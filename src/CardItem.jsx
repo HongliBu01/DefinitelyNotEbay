@@ -7,6 +7,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import { Link } from 'react-router-dom'
+import moment from 'moment'
 
 const styles = {
     card: {
@@ -40,7 +41,8 @@ class CardItem extends React.Component {
             shippingPrice: "",
             startTime: "",
             itemID: "",
-            startPrice: ""
+            startPrice: "",
+            remainingTime: ""
         };
         this.getItem = this.getItem.bind(this)
     }
@@ -59,6 +61,12 @@ class CardItem extends React.Component {
             }).then(data => {
             console.log(data);
             this.setState({...data})
+            if (moment(Date.now()).isAfter(moment(this.state.endTime))) {
+              this.setState({remainingTime: "Expired"})
+            } else {
+              const duration = moment.duration(moment(this.state.endTime).diff(moment(Date.now())))
+              this.setState({remainingTime: duration.humanize()})
+            }
         })
     }
 
@@ -66,9 +74,6 @@ class CardItem extends React.Component {
         return (
             <Card>
                 <CardContent>
-                    <Typography color="textSecondary" gutterBottom>
-                        Item Details
-                    </Typography>
                     <Typography variant="h5" component="h2">
                         {this.state.name || "Not Specified"}
                     </Typography>
@@ -76,18 +81,20 @@ class CardItem extends React.Component {
                         Quantity: {this.state.quantity || "Not Specified"}
                     </Typography>
                     <Typography color="textSecondary">
-                        Time: {this.state.startTime || "Not Specified"} - {this.state.endTime || "Not Specified"}
+                        Time Remaining: {this.state.remainingTime}
                     </Typography>
-                    <Typography component="p">
-                        Bid Price: {this.state.startPrice || "Not Specified"}
+                    <Typography component="textSecondary">
+                        Bid Price: ${this.state.startPrice || "Not Specified"}
                     </Typography>
+                    {this.state.buyPrice === "0.00" ? null : <Typography component="textSecondary">
+                        Buy Price: ${this.state.buyPrice}
+                    </Typography>}
                     <Typography color="textSecondary">
-                        Description:
-                        {this.state.description || "Not Specified"}
+                        Description: {this.state.description || "Not Specified"}
                     </Typography>
                 </CardContent>
                 <CardActions>
-                    <Link to={`/item/${this.state.itemID }`|| 'Null'}><Button size="small">Learn More</Button></Link>
+                    <Link to={`/item/${this.state.itemID }`|| null} style={{ textDecoration: 'none' }}><Button size="small">Learn More</Button></Link>
                 </CardActions>
             </Card>
         );
