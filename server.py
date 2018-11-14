@@ -144,6 +144,20 @@ def watchlist(user_id):
         res = mongo.db.users.find_one_and_update({"_id": ObjectId(user_id)}, {"$set": {"watchlist": user["watchlist"]}})
         return json.dumps(res, default=json_util.default)
 
+@app.route('/api/categories', methods=['GET', 'POST'])
+def categories():
+    if request.method == 'GET':
+        categories = mongo.db.misc.find_one_or_404({"name": "categories"})
+        return json.dumps(categories, default=json_util.default)
+
+    elif request.method == 'POST':
+        category = request.get_json(force=True)
+        current_categories = mongo.db.misc.find_one_or_404({"name": "categories"})
+        current_categories["data"].append(category)
+        # res = mongo.db.misc.insert_one({"name": "categories", "data": {"clothes": 1}})
+        res = mongo.db.misc.find_one_and_update({"name": "categories"}, {"$set": {"data": current_categories["data"]}})
+        return json.dumps(res, default=json_util.default)
+
 @app.route('/<path:path>')
 def catch_all(path):
     return render_template('index.html')
