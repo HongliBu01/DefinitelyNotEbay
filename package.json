@@ -22,7 +22,7 @@
     "auth-js": "0.0.14",
     "auth0-js": "^9.8.2",
     "history": "^4.7.2",
-    "npm": "^6.4.1",
+    "moment": "^2.22.2",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-router-dom": "^4.3.1"

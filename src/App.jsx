@@ -7,8 +7,7 @@ import Profile from './Profile.jsx'
 import ItemPage from './ItemPage.jsx'
 import Auth from "./Auth/Auth";
 import Callback from './Callback/Callback';
-
-
+import WatchListPage from './WatchListPage.jsx'
 
 class App extends React.Component {
   render() {
@@ -28,6 +27,7 @@ class App extends React.Component {
           <Route path="/addItem" component={AddItem} />
           <Route path="/profile" component={Profile} />
           <Route path="/item/:id" component={ItemPage} />
+          <Route path="/users/:user_id/watchlist" component={WatchListPage} />
           <Route path="/callback" render={(props) => {
             handleAuthentication(props);
             return <Callback {...props} />
