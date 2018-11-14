@@ -1,15 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Route, NavLink, BrowserRouter } from 'react-router-dom'
+import {Route, NavLink, BrowserRouter, Router} from 'react-router-dom'
 import AddItem from './AddItem.jsx'
 import App from './App.jsx'
+import history from "./history";
+
 
 class Main extends React.Component {
     render() {
       return (
-        <BrowserRouter>
+      <Router history={history}>
           <App />
-        </BrowserRouter>
+      </Router>
       );
     }
 }
