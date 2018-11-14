@@ -1,14 +1,24 @@
 import React from 'react';
-import { Route, Switch } from 'react-router-dom'
+import { Route, Switch, Router } from 'react-router-dom'
 import PrimarySearchAppBar from './NavBar.jsx';
 import AddItem from './AddItem.jsx'
 import MainPage from './MainPage.jsx'
 import Profile from './Profile.jsx'
 import ItemPage from './ItemPage.jsx'
+import Auth from "./Auth/Auth";
+import Callback from './Callback/Callback';
 import WatchListPage from './WatchListPage.jsx'
 
 class App extends React.Component {
   render() {
+    const auth = new Auth();
+
+    const handleAuthentication = ({location}) => {
+      if (/access_token|id_token|error/.test(location.hash)) {
+        auth.handleAuthentication();
+      }
+    }
+
     return (
       <div>
         <PrimarySearchAppBar/>
@@ -18,6 +28,10 @@ class App extends React.Component {
           <Route path="/profile" component={Profile} />
           <Route path="/item/:id" component={ItemPage} />
           <Route path="/users/:user_id/watchlist" component={WatchListPage} />
+          <Route path="/callback" render={(props) => {
+            handleAuthentication(props);
+            return <Callback {...props} />
+          }}/>
         </Switch>
       </div>
     )

@@ -10,6 +10,7 @@ from bson import json_util
 from flask import Flask, render_template, request
 from flask_pymongo import PyMongo
 
+
 class JSONEncoder(json.JSONEncoder):
     ''' extend json-encoder class'''
 
@@ -19,6 +20,7 @@ class JSONEncoder(json.JSONEncoder):
         if isinstance(o, datetime.datetime):
             return str(o)
         return json.JSONEncoder.default(self, o)
+
 
 app = Flask(__name__)
 
