@@ -17,7 +17,7 @@ class App extends React.Component {
           <Route path="/addItem" component={AddItem} />
           <Route path="/profile" component={Profile} />
           <Route path="/item/:id" component={ItemPage} />
-            <Route path="/users/:user_id/watchlist" component={WatchListPage} />
+          <Route path="/users/:user_id/watchlist" component={WatchListPage} />
         </Switch>
       </div>
     )

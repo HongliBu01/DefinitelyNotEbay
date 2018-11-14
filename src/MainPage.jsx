@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { withRouter } from 'react-router'
 import { Link } from 'react-router-dom'
-
+import Grid from '@material-ui/core/Grid';
 import CardItem from "./CardItem.jsx"
 
 class MainPage extends React.Component {
@@ -70,13 +70,9 @@ class MainPage extends React.Component {
   render() {
     return (
       <div>
-      <h1>THIS IS MAIN PAGE</h1>
-      {/*<ul>*/}
-        {/*{this.state.allItems.map((item, i) => <li key={i}> {item.name || "Unnamed"} <Link to={`/item/${item._id.$oid ? item._id.$oid : item._id}`}>Link</Link> </li>)}*/}
-      {/*</ul>*/}
-      <ul>
-        {this.state.allItems.map((item, i) => <CardItem itemID={item._id.$oid ? item._id.$oid : item._id} />)}
-      </ul>
+      <div style={{margin: '10px'}}>
+      {this.state.allItems.map((item, i) => <CardItem itemID={item._id.$oid ? item._id.$oid : item._id} />)}
+      </div>
       <h3>These are users</h3>
       <ul>
         {this.state.allUsers.map((user, i) => <li key={`user_${i}`}> {user.name || "nullitem"}</li>)}
@@ -90,7 +86,7 @@ class MainPage extends React.Component {
         {this.state.watchlistItems.map((item, i) => <li key={`watch_${i}`}> {item.name || "nullitem"}</li>)}
       </ul>
         <h3>
-            <Link to={`/users/5beb3c55d5e788ace8a79665/watchlist`}>To User Cart</Link>
+            <Link to={`/users/5beb3c55d5e788ace8a79665/watchlist`}>To Sample User Watchlist</Link>
         </h3>
       </div>
     )
