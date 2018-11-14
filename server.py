@@ -46,24 +46,24 @@ def findAllUsers():
 @app.route("/api/users", methods=['POST'])
 def createUser():
   userData = request.get_json(force=True)
-  mongo.db.users.insert_one(userData)
-  return 'OK'
+  res = mongo.db.users.insert_one(userData)
+  return json.dumps(res.inserted_id, default=json_util.default)
 
 
 @app.route('/api/users/<user_id>', methods=['GET', 'PUT', 'DELETE'])
 def handleUser(user_id):
 
   if request.method == 'GET':
-    user = mongo.db.users.find_one_or_404({"_id": ObjectId(user_id)})
+    user = mongo.db.users.find_one({"_id": user_id})
     return json.dumps(user, default=json_util.default)
 
   if request.method == 'PUT':
     newUser = request.get_json(force=True)
-    user = mongo.db.users.find_one_and_update({"_id": ObjectId(user_id)}, {"$set": newUser})
+    user = mongo.db.users.find_one_and_update({"_id": user_id}, {"$set": newUser})
     return 'OK'
 
   if request.method == 'DELETE':
-    mongo.db.users.delete_one({"_id": ObjectId(user_id)})
+    mongo.db.users.delete_one({"_id": user_id})
     return 'OK'
 
 

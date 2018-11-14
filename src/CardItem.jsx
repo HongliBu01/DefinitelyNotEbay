@@ -53,13 +53,11 @@ class CardItem extends React.Component {
 
     getItem() {
         const itemID = this.props.itemID;
-        console.log("ID IS", itemID)
         this.setState({itemID: itemID})
         fetch(`/api/items/${itemID}`)
             .then(results => {
                 return results.json()
             }).then(data => {
-            console.log(data);
             this.setState({...data})
             if (moment(Date.now()).isAfter(moment(this.state.endTime))) {
               this.setState({remainingTime: "Expired"})
@@ -83,10 +81,10 @@ class CardItem extends React.Component {
                     <Typography color="textSecondary">
                         Time Remaining: {this.state.remainingTime}
                     </Typography>
-                    <Typography component="textSecondary">
+                    <Typography color="textSecondary">
                         Bid Price: ${this.state.startPrice || "Not Specified"}
                     </Typography>
-                    {this.state.buyPrice === "0.00" ? null : <Typography component="textSecondary">
+                    {this.state.buyPrice === "0.00" ? null : <Typography color="textSecondary">
                         Buy Price: ${this.state.buyPrice}
                     </Typography>}
                     <Typography color="textSecondary">

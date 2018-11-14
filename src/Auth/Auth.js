@@ -8,7 +8,7 @@ export default class Auth {
     clientID: AUTH_CONFIG.clientId,
     redirectUri: AUTH_CONFIG.callbackUrl,
     responseType: 'token id_token',
-    scope: 'openid'
+    scope: 'openid email'
   });
 
   constructor() {
@@ -16,6 +16,16 @@ export default class Auth {
     this.logout = this.logout.bind(this);
     this.handleAuthentication = this.handleAuthentication.bind(this);
     this.isAuthenticated = this.isAuthenticated.bind(this);
+    this.getProfile = this.getProfile.bind(this)
+    this.getIdToken = this.getIdToken.bind(this)
+  }
+
+  getProfile() {
+    return this.profile
+  }
+
+  getIdToken() {
+    return this.idToken
   }
 
   login() {
@@ -25,7 +35,39 @@ export default class Auth {
   handleAuthentication() {
     this.auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
+        this.idToken = authResult.idToken
+        this.profile = authResult.idTokenPayload
         this.setSession(authResult);
+        // Check if database has this user
+        fetch(`/api/users/${this.profile.sub}`)
+          .then(results => {
+            return results.json()
+          }).then(data => {
+              this.userData = data
+            if (!data) {
+              this.userData = {
+                _id: this.profile.sub,
+                email: this.profile.email,
+                watchlist: [],
+                cart: [],
+                isActive: true,
+                isAdmin: false
+              }
+              // Add user to database
+              fetch('/api/users', {
+                method: 'POST',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(this.userData)
+              }).then(results => {
+                  return results.json()
+                }).then(data => {
+                    console.log(data)
+                });
+            }
+          })
         history.replace('/');
       } else if (err) {
         history.replace('/');
@@ -50,12 +92,14 @@ export default class Auth {
     localStorage.removeItem('access_token');
     localStorage.removeItem('id_token');
     localStorage.removeItem('expires_at');
+    this.idToken = null
+    this.profile = null
     // navigate to the home route
     history.replace('/');
   }
 
   isAuthenticated() {
-    // Check whether the current time is past the 
+    // Check whether the current time is past the
     // access token's expiry time
     let expiresAt = JSON.parse(localStorage.getItem('expires_at'));
     return new Date().getTime() < expiresAt;
