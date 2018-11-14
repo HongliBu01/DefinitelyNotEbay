@@ -65,13 +65,13 @@ class AddItem extends React.Component {
     this.getCategories()
   }
   getCategories() {
-        fetch(`/api/categories`)
-            .then(results => {
-                return results.json()
-            }).then(data => {
-              this.setState({availableCategories: data.data})
-        })
-    }
+    fetch(`/api/categories`)
+      .then(results => {
+          return results.json()
+      }).then(data => {
+        this.setState({availableCategories: data.data})
+    })
+  }
 
   handleChange = name => event => {
     this.setState({
