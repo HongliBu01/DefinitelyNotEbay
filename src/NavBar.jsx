@@ -20,6 +20,7 @@ import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import HomeIcon from '@material-ui/icons/Home';
 import AddBoxIcon from '@material-ui/icons/AddBox';
 import MoreIcon from '@material-ui/icons/MoreVert';
+import Auth from "./Auth/Auth";
 
 const styles = theme => ({
   root: {
@@ -91,6 +92,8 @@ const styles = theme => ({
   },
 });
 
+const auth = new Auth();
+
 class PrimarySearchAppBar extends React.Component {
   constructor(props) {
     super(props);
@@ -98,6 +101,14 @@ class PrimarySearchAppBar extends React.Component {
       anchorEl: null,
       mobileMoreAnchorEl: null,
     };
+  }
+
+  login() {
+    auth.login();
+  }
+
+  logout() {
+    auth.logout();
   }
 
   handleProfileMenuOpen = event => {
@@ -122,8 +133,9 @@ class PrimarySearchAppBar extends React.Component {
     const { classes } = this.props;
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+    const { isAuthenticated } = auth;
 
-    const renderMenu = (
+    const renderMenuIsAuth = (
       <Menu
         anchorEl={anchorEl}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
@@ -133,6 +145,18 @@ class PrimarySearchAppBar extends React.Component {
       >
         <MenuItem onClick={this.handleMenuClose}><Link exact to="/profile" style={{ textDecoration: 'none' }}>Profile</Link></MenuItem>
         <MenuItem onClick={this.handleMenuClose}>My account</MenuItem>
+        <MenuItem onClick={this.logout.bind(this)}>Logout</MenuItem>
+      </Menu>
+    );
+    const renderMenuNotAuth = (
+      <Menu
+        anchorEl={anchorEl}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        open={isMenuOpen}
+        onClose={this.handleMenuClose}
+      >
+        <MenuItem onClick={this.login.bind(this)}>Login/Signup</MenuItem>
       </Menu>
     );
 
@@ -231,7 +255,8 @@ class PrimarySearchAppBar extends React.Component {
             </div>
           </Toolbar>
         </AppBar>
-        {renderMenu}
+        {!isAuthenticated() && renderMenuNotAuth}
+        {isAuthenticated() && renderMenuIsAuth}
         {renderMobileMenu}
       </div>
     );
