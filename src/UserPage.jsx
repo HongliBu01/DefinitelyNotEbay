@@ -1,44 +1,22 @@
 import React from 'react'
 import ReactDOM from 'react-dom';
 import Button from '@material-ui/core/Button';
+import { Link } from 'react-router-dom'
 
-
-/*
- email = fields.Email(required=True)
-    password = fields.Str(required=True)
-
-    user_id = fields.Str(required=True)  # mongo-generated hash string, primary key
-    username = fields.Str(required=True)
-    shipping_address = fields.Str()
-    is_admin = fields.Boolean(default=False)
-    is_suspended = fields.Boolean(default=False)
-
-    cart = fields.Nested(ItemListSchema)
-    watchlist = fields.Nested(ItemListSchema)
-    order_history = fields.List(fields.Nested(ItemListSchema))  # list of carts
-    item_history = fields.List(fields.Str())  # list of ItemIds
-
-
-  ITEM
-    seller_id = fields.Str()  # seller id
-    current_price = fields.Float()
-    bid_history = fields.List(fields.Nested(BidSchema))
-
-*/
+// Only admin should be authorized to see this
+// Can change toggle isAdmin/isActive? -- to edit user
 
 // TODO: Set up button functionality
-// TODO: Handle time. Use moment
 class UserPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       email: "",
-      id: "",
-      password: "",
-      username: "",
-      address: "",
+      _id: "",
+      watchlist: [],
+      cart: [],
       isAdmin: false,
-      isSuspended: false
+      isActive: true
     }
     this.getUser = this.getUser.bind(this)
   }
@@ -49,7 +27,7 @@ class UserPage extends React.Component {
 
 
   getUser() {
-    const userID = this.props.match.params.id
+    const userID = this.props.match.params.user_id
     fetch(`/api/users/${userID}`)
       .then(results => {
         return results.json()
@@ -59,14 +37,25 @@ class UserPage extends React.Component {
     })
   }
 
+
   render() {
+
+    console.log(this.state._id)
     return (
       <div>
-        <h1>{this.state.username}</h1>
+        <h1> User Details </h1>
         <p> Email: {this.state.email}</p>
-        <p> Address: {this.state.address} </p>
+        <p> Admin: {String(this.state.isAdmin)} </p>
+        <p> Active: {String(this.state.isActive)} </p>
+        <p> Watchlist: 
+          <Link to={`/users/${this.state._id}/watchlist`}> Link </Link>
+        </p>
+        <p> Cart: {this.state.cart} </p>
       </div>
     )
   }
+
+
+  // Add functino to toggle isAdmin/isActive attribute of a user
 }
 export default UserPage

@@ -45,6 +45,8 @@ class ItemPage extends React.Component {
 
   getItem() {
     const itemID = this.props.match.params.id
+    console.log("This.props: ", this.props)
+
     this.setState({itemID: itemID})
     fetch(`/api/items/${itemID}`)
       .then(results => {
@@ -123,8 +125,10 @@ class ItemPage extends React.Component {
   }
 
   addToWatchlist() {
-    //DUMMY
-    const userID = "5beb3c55d5e788ace8a79665"
+    //DUMMY --> pass in session userid
+    console.log(this.state)
+
+    const userID = "auth0|5bec65c8c796ea14d658c319"
     fetch(`/api/users/${userID}/watchlist`, {
       method: 'POST',
       headers: {
@@ -146,6 +150,7 @@ class ItemPage extends React.Component {
   }
 
   render() {
+    console.log(this.state)
     return (
       <div>
         <h1>{this.state.name}</h1>

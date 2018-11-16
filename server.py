@@ -114,18 +114,18 @@ def bid(item_id):
 @app.route('/api/users/<user_id>/cart', methods=['GET', 'POST'])
 def cart(user_id):
     if request.method == 'GET':
-        cart = mongo.db.users.find_one({"_id": ObjectId(user_id)})['cart']
+        cart = mongo.db.users.find_one({"_id": user_id})['cart']
         print(cart)
         return json.dumps(cart, default=json_util.default)
 
     elif request.method == 'POST':
         new_cart_item = request.get_json(force=True)
-        user = mongo.db.users.find_one({"_id": ObjectId(user_id)})
+        user = mongo.db.users.find_one({"_id": user_id})
         if "cart" not in user:
             user["cart"] = [new_cart_item]
         else:
             user["cart"].append(new_cart_item)
-        res = mongo.db.users.find_one_and_update({"_id": ObjectId(user_id)}, {"$set": {"cart": user["cart"]}})
+        res = mongo.db.users.find_one_and_update({"_id": user_id}, {"$set": {"cart": user["cart"]}})
         return json.dumps(res, default=json_util.default)
 
 
@@ -133,17 +133,18 @@ def cart(user_id):
 @app.route('/api/users/<user_id>/watchlist', methods=['GET', 'POST'])
 def watchlist(user_id):
     if request.method == 'GET':
-        watchlist = mongo.db.users.find_one({"_id": ObjectId(user_id)})['watchlist']
+        watchlist = mongo.db.users.find_one({"_id": user_id})['watchlist']
         return json.dumps(watchlist, default=json_util.default)
 
     elif request.method == 'POST':
         new_watchlist_item = request.get_json(force=True)
-        user = mongo.db.users.find_one({"_id": ObjectId(user_id)})
+        user = mongo.db.users.find_one({"_id": user_id})
         if "watchlist" not in user:
             user["watchlist"] = [new_watchlist_item]
         else:
-            user["watchlist"].append(new_watchlist_item)
-        res = mongo.db.users.find_one_and_update({"_id": ObjectId(user_id)}, {"$set": {"watchlist": user["watchlist"]}})
+            if new_watchlist_item not in user["watchlist"]: # can't add same item to watchlist again
+                user["watchlist"].append(new_watchlist_item)
+        res = mongo.db.users.find_one_and_update({"_id": user_id}, {"$set": {"watchlist": user["watchlist"]}})
         return json.dumps(res, default=json_util.default)
 
 @app.route('/api/categories', methods=['GET', 'POST'])
