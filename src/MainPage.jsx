@@ -189,7 +189,8 @@ class MainPage extends React.Component {
       </div>
       <h3>These are users</h3>
       <ul>
-        {this.state.allUsers.map((user, i) => <li key={`user_${i}`}> {user.name || "nullitem"}</li>)}
+        {this.state.allUsers.map((user, i) => <li key={`user_${i}`}> {user.email || "nullitem"}
+        <Link to={`/users/${user._id}`}> Link</Link> </li>)}
       </ul>
       <h3>This is the cart</h3>
       <ul>
