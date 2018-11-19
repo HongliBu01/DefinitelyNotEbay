@@ -131,6 +131,7 @@ class PrimarySearchAppBar extends React.Component {
   render() {
     const { anchorEl, mobileMoreAnchorEl } = this.state;
     const { classes } = this.props;
+    const userID = "5beb3c55d5e788ace8a79665";
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
     const { isAuthenticated } = auth;
@@ -180,12 +181,12 @@ class PrimarySearchAppBar extends React.Component {
           </IconButton>
           <p>Sell Item</p>
         </MenuItem></Link>
-        <MenuItem>
+        <Link exact to={`/users/${userID}/cart`} style={{ textDecoration: 'none' }}><MenuItem>
           <IconButton>
             <ShoppingCartIcon />
           </IconButton>
           <p>Shopping Cart</p>
-        </MenuItem>
+        </MenuItem></Link>
         <MenuItem>
           <IconButton>
             <Badge badgeContent={11} color="secondary">
@@ -219,9 +220,11 @@ class PrimarySearchAppBar extends React.Component {
                   <AddBoxIcon />
                 </IconButton>
               </Link>
-              <IconButton>
-                <ShoppingCartIcon />
-              </IconButton>
+              <Link exact to={`/users/${userID}/cart`} style={{ textDecoration: 'none' }}>
+                <IconButton>
+                  <ShoppingCartIcon />
+                </IconButton>
+              </Link>
               <IconButton>
                 <Badge badgeContent={0} color="secondary">
                   <NotificationsIcon />
