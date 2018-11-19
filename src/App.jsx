@@ -10,6 +10,7 @@ import EditUser from './EditUser.jsx'
 import Auth from "./Auth/Auth";
 import Callback from './Callback/Callback';
 import WatchListPage from './WatchListPage.jsx'
+import ShoppingCartPage from './ShoppingCartPage.jsx'
 
 class App extends React.Component {
   render() {
@@ -31,6 +32,7 @@ class App extends React.Component {
           <Route path="/item/:id" component={ItemPage} />
           <Route exact path="/users/:user_id/watchlist" component={WatchListPage} />
           <Route exact path="/users/:user_id/edit_profile" component={EditUser} />
+          <Route exact path="/users/:user_id/cart" component={ShoppingCartPage} />
           {/*
           <Route exact path="users/:user_id/cart" component={CartPage}
           <Route exact path="users/:user_id/buy_history" component={BuyHistoryPage}
