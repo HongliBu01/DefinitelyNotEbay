@@ -39,7 +39,6 @@ class MainPage extends React.Component {
     };
 
     this.getItems = this.getItems.bind(this)
-    this.getUsers = this.getUsers.bind(this)
     this.getCart = this.getCart.bind(this)
     this.getWatchlist = this.getWatchlist.bind(this)
     this.getCategories = this.getCategories.bind(this)
@@ -50,7 +49,6 @@ class MainPage extends React.Component {
 
   componentWillMount() {
     this.getItems();
-    this.getUsers();
     this.getCart();
     this.getWatchlist();
     this.getCategories();
@@ -80,16 +78,6 @@ class MainPage extends React.Component {
           })
           this.setState({allItems: allItems})
       });
-  }
-
-  getUsers() {
-    fetch('/api/users')
-      .then(results => {
-        return results.json()
-      }).then(data => {
-        console.log(data)
-        this.setState({allUsers: data})
-      })
   }
 
   getCategories() {
@@ -163,7 +151,6 @@ class MainPage extends React.Component {
     this.setState({currentItems})
     console.log("CURRENT ITEMS", currentItems)
   }
-//{`/item/${item._id.$oid ? item._id.$oid : item._id}`}
   render() {
     const {profile} = this.state
     return (
@@ -198,22 +185,6 @@ class MainPage extends React.Component {
       <div style={{margin: '10px'}}>
       {this.state.currentItems.length > 0 || this.state.selectedCategories.length > 0 ? this.state.currentItems.map((item, i) => <CardItem key={item._id.$oid} itemID={item._id.$oid ? item._id.$oid : item._id} />) : this.state.allItems.map((item, i) => <CardItem key={item._id.$oid} itemID={item._id.$oid ? item._id.$oid : item._id} />)}
       </div>
-      <h3>These are users</h3>
-      <ul>
-        {this.state.allUsers.map((user, i) => <li key={`user_${i}`}> {user.email || "nullitem"}
-        <Link to={`/users/${user._id}`}> Link</Link> </li>)}
-      </ul>
-      <h3>This is the cart</h3>
-      <ul>
-        {this.state.cartItems.map((item, i) => <li key={`cart_${i}`}> {item.name || "nullitem"}</li>)}
-      </ul>
-      <h3>This is the watchlist</h3>
-      <ul>
-        {this.state.watchlistItems.map((item, i) => <li key={`watch_${i}`}> {item.name || "nullitem"}</li>)}
-      </ul>
-        <h3>
-            <Link to={`/users/5beb3c55d5e788ace8a79665/watchlist`}>To Sample User Watchlist</Link>
-        </h3>
       </div>
     )
   }

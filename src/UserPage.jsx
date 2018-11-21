@@ -16,46 +16,73 @@ class UserPage extends React.Component {
       watchlist: [],
       cart: [],
       isAdmin: false,
-      isActive: true
+      isActive: true,
+      profile: {},
+      allUsers: []
     }
     this.getUser = this.getUser.bind(this)
+    this.getUsers = this.getUsers.bind(this)
   }
 
   componentWillMount() {
-    this.getUser();
+    // Handle user details
+    const { userProfile, getProfile } = this.props.auth
+    if (!userProfile) {
+      getProfile((err, profile) => {
+        this.setState({profile})
+        this.getUser(profile.sub)
+      })
+    } else {
+      this.setState({ profile: userProfile })
+      this.getUser(userProfile.sub)
+    }
   }
 
 
-  getUser() {
-    const userID = this.props.match.params.user_id
+  getUser(userID) {
     fetch(`/api/users/${userID}`)
       .then(results => {
         return results.json()
       }).then(data => {
         console.log(data)
         this.setState({...data})
+        if (data.isAdmin) {
+          this.getUsers()
+        }
     })
+  }
+
+  getUsers() {
+    fetch('/api/users')
+      .then(results => {
+        return results.json()
+      }).then(data => {
+        console.log(data)
+        this.setState({allUsers: data})
+      })
   }
 
 
   render() {
-
-    console.log(this.state._id)
     return (
       <div>
-        <h1> User Details </h1>
-        <p> Email: {this.state.email}</p>
-        <p> Admin: {String(this.state.isAdmin)} </p>
-        <p> Active: {String(this.state.isActive)} </p>
-        <p> Watchlist: 
-          <Link to={`/users/${this.state._id}/watchlist`}> Link </Link>
-        </p>
-        <p> Cart: {this.state.cart} </p>
+      {this.state.isAdmin ?
+        <div>
+        {this.state.allUsers.map((user, key) => <div key={key}>
+          <ul>
+          <li> Id: {user._id} </li>
+          <li> Email: {user.email} </li>
+          <li> Active: {String(user.isActive)} </li>
+          <li> Admin: {String(user.isAdmin)} </li>
+          <Button> Suspend User </Button>
+          <Button> Delete User </Button>
+          <Button> Make Admin </Button>
+          </ul>
+          </div>)}
+        </div>
+      : <div> You are not authorized to view this page </div>}
       </div>
     )
   }
-
-
-  // Add functino to toggle isAdmin/isActive attribute of a user
 }
 export default UserPage

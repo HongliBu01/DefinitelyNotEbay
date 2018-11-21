@@ -30,16 +30,16 @@ class App extends React.Component {
           <Route path="/addItem" render={(props) => <AddItem auth={auth} />} />
           <Route path="/profile" render={(props) => <Profile auth={auth} />} />
           <Route path="/item/:id" render={(props) => <ItemPage auth={auth} {...props}/>} />
-          <Route exact path="/users/:user_id/watchlist" render={(props) => <WatchListPage auth={auth} {...props}/>} />
+          <Route exact path="/watchlist" render={(props) => <WatchListPage auth={auth} {...props}/>} />
           <Route exact path="/account" render={(props) => <EditUser auth={auth} {...props}/>} />
           <Route exact path="/cart" render={(props) => <ShoppingCartPage auth={auth} {...props}/>} />
+          <Route exact path="/admin/users" render={(props) => <UserPage auth={auth} {...props}/>} />
           {/*
           <Route exact path="users/:user_id/cart" component={CartPage}
           <Route exact path="users/:user_id/buy_history" component={BuyHistoryPage}
           <Route exact path="users/:user_id/bid_history" component={BidHistoryPage}
           <Route exact path="users/:user_id/item_history" component={ItemHistoryPage}
           */}
-          <Route path="/users/:user_id" component={UserPage} />
           <Route path="/callback" render={(props) => {
             handleAuthentication(props);
             return <Callback {...props} />
