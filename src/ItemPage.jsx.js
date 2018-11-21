@@ -43,6 +43,7 @@ class ItemPage extends React.Component {
   componentWillMount() {
     this.getItem();
     const { userProfile, getProfile } = this.props.auth
+    console.log('AUTH', this.props.auth)
     if (!userProfile) {
       getProfile((err, profile) => {
         this.setState({profile})
@@ -50,6 +51,7 @@ class ItemPage extends React.Component {
     } else {
       this.setState({ profile: userProfile })
     }
+    console.log('PROFILE', this.state.profile)
   }
 
   getItem() {
@@ -59,6 +61,7 @@ class ItemPage extends React.Component {
       .then(results => {
         return results.json()
       }).then(data => {
+        console.log("Input Data", data)
         this.setState({...data})
         if (this.state.bidHistory.length > 0) {
           this.setState({startingPrice: this.state.bidHistory[this.state.bidHistory.length-1]})
@@ -159,7 +162,7 @@ class ItemPage extends React.Component {
         <p> Time Left: {this.state.expired ? "Auction has ended" : this.state.remainingTime} </p>
         <p> Bid Price: ${this.state.startPrice} </p>
         <Button variant="contained" onClick={()=>this.toggleBid()} disabled={this.state.expired}> Bid </Button>
-        {this.state.bid && !this.state.expired && this.state.profile.hasOwnProperty('sub') ? <div><form autoComplete="off">
+        {this.state.bid && !this.state.expired ? <div><form autoComplete="off">
         <TextField
             required
             label="Bid Amount"
@@ -180,7 +183,7 @@ class ItemPage extends React.Component {
         </form>
         <Button variant="contained" onClick={()=>this.handleBid()} disabled={!this.state.validBid}> Make Bid </Button>
         </div>: null}
-        {this.state.buyPrice !== "0.00" ? <div><p>Buy Price: ${this.state.buyPrice}</p><Button variant="contained" onClick={()=>this.addToCart()} disabled={!this.state.profile.hasOwnProperty('sub')}> Buy Now </Button></div> : ""}
+        {this.state.buyPrice !== "0.00" ? <div><p>Buy Price: ${this.state.buyPrice}</p><Button variant="contained" onClick={()=>this.addToCart()}> Buy Now </Button></div> : ""}
         <p> Shipping price: ${this.state.shippingPrice} </p>
         <h4>Description</h4>
         {this.state.description}
