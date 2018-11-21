@@ -131,7 +131,6 @@ class PrimarySearchAppBar extends React.Component {
   render() {
     const { anchorEl, mobileMoreAnchorEl } = this.state;
     const { classes } = this.props;
-    const userID = "5beb3c55d5e788ace8a79665";
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
     const { isAuthenticated } = auth;
@@ -145,7 +144,8 @@ class PrimarySearchAppBar extends React.Component {
         onClose={this.handleMenuClose}
       >
         <MenuItem onClick={this.handleMenuClose}><Link exact to="/profile" style={{ textDecoration: 'none' }}>Profile</Link></MenuItem>
-        <MenuItem onClick={this.handleMenuClose}>My account</MenuItem>
+        <MenuItem onClick={this.handleMenuClose}><Link exact to="/account" style={{ textDecoration: 'none' }}>My Account</Link></MenuItem>
+        <MenuItem onClick={this.handleMenuClose}><Link exact to="/watchlist" style={{ textDecoration: 'none' }}>Watchlist</Link></MenuItem>
         <MenuItem onClick={this.logout.bind(this)}>Logout</MenuItem>
       </Menu>
     );
@@ -181,7 +181,7 @@ class PrimarySearchAppBar extends React.Component {
           </IconButton>
           <p>Sell Item</p>
         </MenuItem></Link>
-        <Link exact to={`/users/${userID}/cart`} style={{ textDecoration: 'none' }}><MenuItem>
+        <Link exact to={`/cart`} style={{ textDecoration: 'none' }}><MenuItem>
           <IconButton>
             <ShoppingCartIcon />
           </IconButton>
@@ -220,7 +220,7 @@ class PrimarySearchAppBar extends React.Component {
                   <AddBoxIcon />
                 </IconButton>
               </Link>
-              <Link exact to={`/users/${userID}/cart`} style={{ textDecoration: 'none' }}>
+              <Link exact to={`/cart`} style={{ textDecoration: 'none' }}>
                 <IconButton>
                   <ShoppingCartIcon />
                 </IconButton>

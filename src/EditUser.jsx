@@ -13,8 +13,6 @@ import InputLabel from '@material-ui/core/InputLabel';
 
 
 // TODO: Sanitize inputs
-// TODO: passin userID from session
-// TODO: Redirect to item page
 // Not quite working...
 class EditUser extends React.Component {
   constructor(props) {
@@ -25,18 +23,31 @@ class EditUser extends React.Component {
       watchlist: [],
       cart: [],
       isAdmin: false,
-      isActive: true
+      isActive: true,
+      profile: {}
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.getUser = this.getUser.bind(this);
+    this.suspendAccount = this.suspendAccount.bind(this);
+    this.deleteAccount = this.deleteAccount.bind(this);
   }
 
   componentWillMount() {
-    this.getUser();
+    // Handle user details
+    const { userProfile, getProfile } = this.props.auth
+    if (!userProfile) {
+      getProfile((err, profile) => {
+        this.setState({profile})
+        this.getUser(profile.sub)
+      })
+    } else {
+      this.setState({ profile: userProfile })
+      this.getUser(userProfile.sub)
+    }
   }
 
-  getUser() {
-    const userID = this.props.match.params.user_id
+  getUser(userID) {
     fetch(`/api/users/${userID}`)
       .then(results => {
         return results.json()
@@ -53,15 +64,14 @@ class EditUser extends React.Component {
   };
 
   handleSubmit() {
-    const userID = "5beb3c55d5e788ace8a79665"
-
+    const userID = this.state._id
     fetch(`/api/users/${userID}`, {
       method: 'PUT',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         email: this.state.email
       })
     }).then(results => {
@@ -73,13 +83,22 @@ class EditUser extends React.Component {
       });
   }
 
+  suspendAccount() {
+    console.log('TOGGLE ISACTIVE FLAG')
+  }
+
+  deleteAccount() {
+    console.log('REMOVE ACCOUNT')
+  }
+
   render() {
     if (this.state.redirect) {
       return <Redirect push to="/" />;
     }
     return(
       <div style={{ margin: '10px'}}>
-        <h1>Edit Profile</h1>
+        <h1>Edit Account</h1>
+        <h2> Change Email </h2>
         <form noValidate autoComplete="off">
           <TextField
             required
@@ -92,6 +111,10 @@ class EditUser extends React.Component {
           <br />
       </form>
       <Button onClick={()=>this.handleSubmit()}> Submit </Button>
+      {this.state.isActive ? <h2>Suspend Account</h2> : <h2>Activate Account</h2> }
+      <Button onClick={()=>this.suspendAccount('suspend')}>  {this.state.isActive ? 'Suspend' : 'Activate'}  </Button>
+      <h2> Delete Account </h2>
+      <Button onClick={()=>this.deleteAccount()}> Delete </Button>
       </div>
     )
   }

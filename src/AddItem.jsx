@@ -33,7 +33,6 @@ const MenuProps = {
     },
   },
 };
-// TODO: Separate out categories so pull existing categories
 // TODO: Sanitize inputs
 // TODO: Add userID
 // TODO: Redirect to item page
@@ -41,6 +40,7 @@ class AddItem extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      _id: "",
       description: "",
       name: "",
       quantity: 1,
@@ -53,7 +53,8 @@ class AddItem extends React.Component {
       redirect: false,
       selectedCategories: [],
       availableCategories: [],
-      invalidCategory: false
+      invalidCategory: false,
+      profile: {}
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -63,6 +64,15 @@ class AddItem extends React.Component {
 
   componentWillMount() {
     this.getCategories()
+    // Handle user details
+    const { userProfile, getProfile } = this.props.auth
+    if (!userProfile) {
+      getProfile((err, profile) => {
+        this.setState({profile})
+      })
+    } else {
+      this.setState({ profile: userProfile })
+    }
   }
   getCategories() {
     fetch(`/api/categories`)
@@ -87,11 +97,6 @@ class AddItem extends React.Component {
   };
 
   handleSubmit() {
-    // // Split categories into array after cleaning
-    // const categories = this.state.categories.toLowerCase().split(",")
-    // for (var i = 0; i < categories.length; i++) {
-    //   categories[i] = categories[i].trim()
-    // }
     fetch('/api/items', {
       method: 'POST',
       headers: {
@@ -99,6 +104,7 @@ class AddItem extends React.Component {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
+        seller: this.state.profile.sub,
         description: this.state.description,
         name: this.state.name,
         quantity: this.state.quantity,
@@ -114,6 +120,7 @@ class AddItem extends React.Component {
         return results.json()
       }).then(data => {
           if (data._id) {
+            this.setState({_id: data._id})
             this.setState({redirect: true})
           }
       });
@@ -142,7 +149,7 @@ class AddItem extends React.Component {
 
   render() {
     if (this.state.redirect) {
-      return <Redirect push to="/" />;
+      return <Redirect push to={`/item/${this.state._id}`} />;
     }
     return(
       <div style={{ margin: '10px'}}>

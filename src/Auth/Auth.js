@@ -18,14 +18,29 @@ export default class Auth {
     this.isAuthenticated = this.isAuthenticated.bind(this);
     this.getProfile = this.getProfile.bind(this)
     this.getIdToken = this.getIdToken.bind(this)
+    this.getAccessToken = this.getAccessToken.bind(this)
   }
 
-  getProfile() {
-    return this.profile
+  getProfile(callback) {
+    let accessToken = this.getAccessToken();
+    this.auth0.client.userInfo(accessToken, (err, profile) => {
+      if (profile) {
+        this.userProfile = profile;
+      }
+    callback(err, profile);
+    });
   }
 
   getIdToken() {
     return this.idToken
+  }
+
+  getAccessToken() {
+    const accessToken = localStorage.getItem('access_token')
+    if (!accessToken) {
+      throw new Error('No Access Token found')
+    }
+    return accessToken
   }
 
   login() {
