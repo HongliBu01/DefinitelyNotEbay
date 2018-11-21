@@ -160,7 +160,8 @@ def delete_watchlist_item(user_id, item_id):
     else:
         res = mongo.db.users.find_one({"_id": user_id}) # TODO: Why this????
     return json.dumps(res, default=json_util.default)
-# TODO: This is too repetitive. Looks very much like update. Need to group them up.
+# TODO: This is too repetitive. Looks very much like update.
+# Need to group them up.
 
 
 @app.route('/api/categories', methods=['GET', 'POST'])
