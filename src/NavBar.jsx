@@ -145,7 +145,7 @@ class PrimarySearchAppBar extends React.Component {
         onClose={this.handleMenuClose}
       >
         <MenuItem onClick={this.handleMenuClose}><Link exact to="/profile" style={{ textDecoration: 'none' }}>Profile</Link></MenuItem>
-        <MenuItem onClick={this.handleMenuClose}>My account</MenuItem>
+        <MenuItem onClick={this.handleMenuClose}><Link exact to="/account" style={{ textDecoration: 'none' }}>My Account</Link></MenuItem>
         <MenuItem onClick={this.logout.bind(this)}>Logout</MenuItem>
       </Menu>
     );

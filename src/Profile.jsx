@@ -67,8 +67,8 @@ class Profile extends React.Component {
         <p> <Link to={`/users/${this.state._id}/bid_history`}> Past Bids </Link></p>
         <p> <Link to={`/users/${this.state._id}/item_history`}> Your Item Listings </Link></p>
 
-        <h1> Edit Profile </h1>
-        <p> <Link to={`/users/${this.state._id}/edit_profile`}> Edit Profile </Link></p>
+        <h1> My Account </h1>
+        <p> <Link to={`/users/${this.state._id}/account`}> Edit Account Details </Link></p>
       </div>
     )
   }
