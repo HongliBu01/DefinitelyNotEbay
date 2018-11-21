@@ -39,8 +39,6 @@ class MainPage extends React.Component {
     };
 
     this.getItems = this.getItems.bind(this)
-    this.getCart = this.getCart.bind(this)
-    this.getWatchlist = this.getWatchlist.bind(this)
     this.getCategories = this.getCategories.bind(this)
     this.filterCategory = this.filterCategory.bind(this)
     this.handleChange = this.handleChange.bind(this)
@@ -49,8 +47,6 @@ class MainPage extends React.Component {
 
   componentWillMount() {
     this.getItems();
-    this.getCart();
-    this.getWatchlist();
     this.getCategories();
     // Handle user details
     const { userProfile, getProfile } = this.props.auth
@@ -89,26 +85,6 @@ class MainPage extends React.Component {
     })
   }
 
-  getCart() {
-    fetch('/api/users/5bdd060508ffae36201e3a79/cart') // TODO: URL Parsing, get correct userID
-      .then(results => {
-        return results.json()
-      }).then(data => {
-        console.log(data)
-        this.setState({cartItems: data})
-      })
-  }
-
-  getWatchlist() {
-    fetch('/api/users/5bdd060508ffae36201e3a79/cart') // TODO: URL Parsing
-      .then(results => {
-        return results.json()
-      }).then(data => {
-        console.log(data)
-        this.setState({watchlistItems: data})
-      })
-  }
-
   handleChange = name => event => {
     this.setState({
       [name]: event.target.value,
@@ -131,14 +107,12 @@ class MainPage extends React.Component {
       })
     } else {
       this.state.allItems.forEach((item) => {
-        console.log(item)
         if (item.name.toLowerCase().startsWith(searchTerm.toLowerCase())) {
           currentItems.push(item)
         }
       })
     }
     this.setState({currentItems})
-    // console.log(currentItems)
   }
 
   filterCategory(selectedCategories) {
@@ -149,7 +123,6 @@ class MainPage extends React.Component {
       }
     })
     this.setState({currentItems})
-    console.log("CURRENT ITEMS", currentItems)
   }
   render() {
     const {profile} = this.state

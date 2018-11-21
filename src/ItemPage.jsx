@@ -123,7 +123,8 @@ class ItemPage extends React.Component {
       },
       body: JSON.stringify({
         _id: this.state.itemID,
-        price: price
+        price: price,
+        type: "buyNow"
       })
     }).then(results => {
       return results.json()

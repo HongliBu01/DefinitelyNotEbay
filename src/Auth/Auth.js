@@ -66,7 +66,10 @@ export default class Auth {
                 watchlist: [],
                 cart: [],
                 isActive: true,
-                isAdmin: false
+                isAdmin: false,
+                bidHistory: [],
+                buyHistory: [],
+                listings: []
               }
               // Add user to database
               fetch('/api/users', {
