@@ -34,7 +34,8 @@ class MainPage extends React.Component {
       currentItems: [],
       categories: [],
       selectedCategories: [],
-      search: ""
+      search: "",
+      profile: {}
     };
 
     this.getItems = this.getItems.bind(this)
@@ -53,6 +54,15 @@ class MainPage extends React.Component {
     this.getCart();
     this.getWatchlist();
     this.getCategories();
+    // Handle user details
+    const { userProfile, getProfile } = this.props.auth
+    if (!userProfile) {
+      getProfile((err, profile) => {
+        this.setState({profile})
+      })
+    } else {
+      this.setState({ profile: userProfile })
+    }
   }
 
   getItems() {
@@ -155,6 +165,7 @@ class MainPage extends React.Component {
   }
 //{`/item/${item._id.$oid ? item._id.$oid : item._id}`}
   render() {
+    const {profile} = this.state
     return (
       <div>
       <InputLabel htmlFor="select-multiple-chip">Categories </InputLabel>

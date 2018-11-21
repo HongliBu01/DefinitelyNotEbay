@@ -53,7 +53,8 @@ class AddItem extends React.Component {
       redirect: false,
       selectedCategories: [],
       availableCategories: [],
-      invalidCategory: false
+      invalidCategory: false,
+      profile: {}
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -63,6 +64,15 @@ class AddItem extends React.Component {
 
   componentWillMount() {
     this.getCategories()
+    // Handle user details
+    const { userProfile, getProfile } = this.props.auth
+    if (!userProfile) {
+      getProfile((err, profile) => {
+        this.setState({profile})
+      })
+    } else {
+      this.setState({ profile: userProfile })
+    }
   }
   getCategories() {
     fetch(`/api/categories`)

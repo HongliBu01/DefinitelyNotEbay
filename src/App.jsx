@@ -25,21 +25,21 @@ class App extends React.Component {
     return (
       <div>
         <PrimarySearchAppBar/>
-        <Switch> 
-          <Route exact path="/" component={MainPage} />
-          <Route path="/addItem" component={AddItem} />
-          <Route path="/profile" component={Profile} />
-          <Route path="/item/:id" component={ItemPage} />
-          <Route exact path="/users/:user_id/watchlist" component={WatchListPage} />
-          <Route exact path="/users/:user_id/edit_profile" component={EditUser} />
-          <Route exact path="/users/:user_id/cart" component={ShoppingCartPage} />
+        <Switch>
+          <Route exact path="/" render={(props) => <MainPage auth={auth} />} />
+          <Route path="/addItem" render={(props) => <AddItem auth={auth} />} />
+          <Route path="/profile" render={(props) => <Profile auth={auth} />} />
+          <Route path="/item/:id" render={(props) => <ItemPage auth={auth} />} />
+          <Route exact path="/users/:user_id/watchlist" render={(props) => <WatchListPage auth={auth} />} />
+          <Route exact path="/users/:user_id/edit_profile" render={(props) => <EditPage auth={auth} />} />
+          <Route exact path="/users/:user_id/cart" render={(props) => <ShoppingCartPage auth={auth} />} />
           {/*
           <Route exact path="users/:user_id/cart" component={CartPage}
           <Route exact path="users/:user_id/buy_history" component={BuyHistoryPage}
           <Route exact path="users/:user_id/bid_history" component={BidHistoryPage}
           <Route exact path="users/:user_id/item_history" component={ItemHistoryPage}
           */}
-          <Route path="/users/:user_id" component={UserPage} /> 
+          <Route path="/users/:user_id" component={UserPage} />
           <Route path="/callback" render={(props) => {
             handleAuthentication(props);
             return <Callback {...props} />

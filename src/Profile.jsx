@@ -24,18 +24,28 @@ class Profile extends React.Component {
       watchlist: [],
       cart: [],
       isAdmin: false,
-      isActive: true
+      isActive: true,
+      profile: {}
     }
     this.getUser = this.getUser.bind(this)
   }
 
   componentWillMount() {
-    this.getUser();
+    // Handle user details
+    const { userProfile, getProfile } = this.props.auth
+    if (!userProfile) {
+      getProfile((err, profile) => {
+        this.setState({profile})
+        this.getUser(profile.sub)
+      })
+    } else {
+      this.setState({ profile: userProfile })
+      this.getUser(userProfile.sub)
+    }
   }
 
 
-  getUser() {
-    const userID = this.props.match.params.user_id
+  getUser(userID) {
     fetch(`/api/users/${userID}`)
       .then(results => {
         return results.json()
@@ -45,14 +55,11 @@ class Profile extends React.Component {
     })
   }
 
-  // TODO: replace this.state._id with the user_id of whoever's logged in
   render() {
-
-    console.log("ID", this.state._id)
     return (
       <div>
         <h1> User Profile </h1>
-        <p> Email: {this.state.email}</p>
+        <p> Email: {this.state.profile.email}</p>
         <p> Active: {String(this.state.isActive)} </p>
         <p> <Link to={`/users/${this.state._id}/watchlist`}> Watchlist </Link> </p>
         <p> <Link to={`/users/${this.state._id}/cart`}> Cart </Link> </p>
