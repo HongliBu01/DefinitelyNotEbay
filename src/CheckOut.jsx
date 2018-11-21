@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom';
 import { withStyles } from '@material-ui/core/styles';
 
+// TODO: Handle transaction
 class CheckoutPage extends React.Component{
   constructor(props){
     super(props)

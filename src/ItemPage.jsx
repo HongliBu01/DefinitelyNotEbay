@@ -7,6 +7,7 @@ import moment from 'moment'
 
 // TODO: Set up Report Item functionality
 // TODO: Prevent adding to cart and watchlist multiple times
+// TODO: Get user and don't allow bidding/buying if not active
 class ItemPage extends React.Component {
   constructor(props) {
     super(props);

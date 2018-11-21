@@ -95,7 +95,7 @@ class AddItem extends React.Component {
   };
 
   handleSubmit() {
-    // Handle check if auction is currently active (current time between start time and end time)
+    // TODO: Handle check if auction is currently active (current time between start time and end time)
     fetch('/api/items', {
       method: 'POST',
       headers: {

@@ -93,7 +93,7 @@ const styles = theme => ({
 });
 
 const auth = new Auth();
-
+// TODO: Add admin-only links
 class PrimarySearchAppBar extends React.Component {
   constructor(props) {
     super(props);

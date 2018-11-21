@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom'
 import CardItem from './CardItem.jsx'
 
 // TODO: Handle price formatting
+// TODO: Edit cart if not bid type item
 class ShoppingCartPage extends React.Component{
 	constructor(props){
 		super(props)

@@ -14,7 +14,7 @@ import { Link } from 'react-router-dom'
 // Link to watchlist, cart, bid_history, buy_history, item_history
 // Can edit email
 
-// TODO: Figure out how to pass in logged in session info
+// TODO: Set up bid_history, buy_history, listings
 class Profile extends React.Component {
   constructor(props) {
     super(props);
@@ -58,7 +58,8 @@ class Profile extends React.Component {
   render() {
     return (
       <div>
-        <h1> User Profile </h1>
+        {this.state.profile.hasOwnProperty(sub) ?
+        <div><h1> User Profile </h1>
         <p> Email: {this.state.profile.email}</p>
         <p> Active: {String(this.state.isActive)} </p>
         <p> <Link to={`/users/${this.state._id}/watchlist`}> Watchlist </Link> </p>
@@ -68,7 +69,8 @@ class Profile extends React.Component {
         <p> <Link to={`/users/${this.state._id}/item_history`}> Your Item Listings </Link></p>
 
         <h1> My Account </h1>
-        <p> <Link to={`/users/${this.state._id}/account`}> Edit Account Details </Link></p>
+        <p> <Link to={`/users/${this.state._id}/account`}> Edit Account Details </Link></p></div> :
+        <p> Please log in to view this page. </p>}
       </div>
     )
   }
