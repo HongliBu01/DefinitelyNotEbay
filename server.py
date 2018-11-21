@@ -9,6 +9,7 @@ from bson.objectid import ObjectId
 from bson import json_util
 from flask import Flask, render_template, request
 from flask_pymongo import PyMongo
+from flask_socketio import SocketIO
 
 
 class JSONEncoder(json.JSONEncoder):
@@ -26,6 +27,7 @@ app = Flask(__name__)
 
 # add mongo url to flask config, so that flask_pymongo can use it to make connection
 app.config['MONGO_URI'] = config.DB
+socketio = SocketIO(app)
 mongo = PyMongo(app)
 
 
@@ -175,6 +177,10 @@ def categories():
         res = mongo.db.misc.find_one_and_update({"name": "categories"}, {"$set": {"data": current_categories["data"]}})
         return json.dumps(res, default=json_util.default)
 
+@socketio.on('seller alert')
+def handle_seller_alert(json):
+    print('Received json: ' + str(json))
+
 @app.route('/<path:path>')
 def catch_all(path):
     return render_template('index.html')
@@ -182,4 +188,5 @@ def catch_all(path):
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=os.environ.get('PORT', 3000), debug=True)
+    socketio.run(app, host='0.0.0.0', port=os.environ.get('PORT', 3000), debug=True)
+    # app.run(host='0.0.0.0', port=os.environ.get('PORT', 3000), debug=True)
