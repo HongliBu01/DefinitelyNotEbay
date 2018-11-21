@@ -2,3 +2,5 @@ flask
 flask_pymongo
 requests
 marshmallow
+wtforms
+flask_wtf

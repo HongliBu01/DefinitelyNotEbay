@@ -45,6 +45,7 @@ class CardItem extends React.Component {
             remainingTime: ""
         };
         this.getItem = this.getItem.bind(this)
+        this.removeFromWatchlist = this.removeFromWatchlist.bind(this)
     }
 
     componentWillMount() {
@@ -66,6 +67,11 @@ class CardItem extends React.Component {
               this.setState({remainingTime: duration.humanize()})
             }
         })
+    }
+
+    removeFromWatchlist() {
+        console.log("triggering remove from watchlist")
+        //TODO: implement this.removeFromWatchlist(), probably import from Item Page?
     }
 
     render() {
@@ -93,6 +99,9 @@ class CardItem extends React.Component {
                 </CardContent>
                 <CardActions>
                     <Link to={`/item/${this.state.itemID }`|| null} style={{ textDecoration: 'none' }}><Button size="small">Learn More</Button></Link>
+                </CardActions>
+                <CardActions>
+                    <Button onClick={()=>this.removeFromWatchlist()} size="small">Remove From Watchlist</Button>
                 </CardActions>
             </Card>
         );

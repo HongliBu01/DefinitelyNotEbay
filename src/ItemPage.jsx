@@ -37,6 +37,8 @@ class ItemPage extends React.Component {
     this.addToCart = this.addToCart.bind(this)
     this.addToWatchlist = this.addToWatchlist.bind(this)
     this.reportItem = this.reportItem.bind(this)
+    // remove from watch list - zhenghong
+    this.removeFromWatchlist = this.removeFromWatchlist.bind(this)
   }
 
   componentWillMount() {
@@ -145,6 +147,12 @@ class ItemPage extends React.Component {
     })
   }
 
+  removeFromWatchlist() {
+      // Not implemented yet
+      // TODO: implement this.removeFromWatchlist(), probably import from Card Item?
+      console.log("triggering remove from watchlist")
+  }
+
   reportItem() {
     console.log("REPORT")
   }
@@ -187,6 +195,8 @@ class ItemPage extends React.Component {
         {this.state.categories}
         <br />
         <Button variant="contained" onClick={()=>this.addToWatchlist()}>Add to Watchlist </Button>
+        {/*remove from watchlist*/}
+        <Button variant="contained" onClick={()=>this.removeFromWatchlist()}>Remove from Watchlist</Button>
         <Button variant="contained" onClick={()=>this.reportItem()}>Report Item </Button>
       </div>
     )

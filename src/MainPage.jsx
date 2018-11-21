@@ -200,9 +200,9 @@ class MainPage extends React.Component {
       <ul>
         {this.state.watchlistItems.map((item, i) => <li key={`watch_${i}`}> {item.name || "nullitem"}</li>)}
       </ul>
-        <h3>
-            <Link to={`/users/5beb3c55d5e788ace8a79665/watchlist`}>To Sample User Watchlist</Link>
-        </h3>
+        {/*<h3>*/}
+            {/*<Link to={`/users/5beb3c55d5e788ace8a79665/watchlist`}>To Sample User Watchlist</Link>*/}
+        {/*</h3>*/}
       </div>
     )
   }
