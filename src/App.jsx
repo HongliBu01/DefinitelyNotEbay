@@ -33,6 +33,7 @@ class App extends React.Component {
           <Route exact path="/watchlist" render={(props) => <WatchListPage auth={auth} {...props}/>} />
           <Route exact path="/account" render={(props) => <EditUser auth={auth} {...props}/>} />
           <Route exact path="/cart" render={(props) => <ShoppingCartPage auth={auth} {...props}/>} />
+          <Route exact path="/checkout" render={(props) => <ShoppingCartPage auth={auth} {...props}/>} />
           <Route exact path="/admin/users" render={(props) => <UserPage auth={auth} {...props}/>} />
           {/*
           <Route exact path="users/:user_id/cart" component={CartPage}

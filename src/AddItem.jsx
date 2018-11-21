@@ -33,9 +33,7 @@ const MenuProps = {
     },
   },
 };
-// TODO: Sanitize inputs
-// TODO: Add userID
-// TODO: Redirect to item page
+// TODO: Sanitize inputs (prevent ending times in past)
 class AddItem extends React.Component {
   constructor(props) {
     super(props);
@@ -120,7 +118,7 @@ class AddItem extends React.Component {
         return results.json()
       }).then(data => {
           if (data._id) {
-            this.setState({_id: data._id})
+            this.setState({_id: data._id.$oid})
             this.setState({redirect: true})
           }
       });
