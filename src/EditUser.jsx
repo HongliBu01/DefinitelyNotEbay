@@ -13,7 +13,8 @@ import InputLabel from '@material-ui/core/InputLabel';
 
 
 // TODO: Sanitize inputs
-// Not quite working...
+// TODO: Add functionality to suspend and delete account
+// TODO: Handle email change on Auth0
 class EditUser extends React.Component {
   constructor(props) {
     super(props);
@@ -112,7 +113,7 @@ class EditUser extends React.Component {
       </form>
       <Button onClick={()=>this.handleSubmit()}> Submit </Button>
       {this.state.isActive ? <h2>Suspend Account</h2> : <h2>Activate Account</h2> }
-      <Button onClick={()=>this.suspendAccount('suspend')}>  {this.state.isActive ? 'Suspend' : 'Activate'}  </Button>
+      <Button onClick={()=>this.suspendAccount()}>  {this.state.isActive ? 'Suspend' : 'Activate'}  </Button>
       <h2> Delete Account </h2>
       <Button onClick={()=>this.deleteAccount()}> Delete </Button>
       </div>
