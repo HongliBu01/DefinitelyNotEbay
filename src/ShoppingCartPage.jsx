@@ -15,11 +15,21 @@ class ShoppingCartPage extends React.Component{
 	}
 
 	componentWillMount(){
+    // Handle user details
+    const { userProfile, getProfile } = this.props.auth
+    if (!userProfile) {
+      getProfile((err, profile) => {
+        this.setState({profile})
+        this.getShoppingCart(profile.sub)
+      })
+    } else {
+      this.setState({ profile: userProfile })
+      this.getShoppingCart(userProfile.sub)
+    }
 		this.getShoppingCart()
 	}
 
-	getShoppingCart() {
-    const userID = this.props.match.params.user_id;
+	getShoppingCart(userID) {
     fetch(`/api/users/${userID}/cart`)
       .then(results => {
         return results.json()
@@ -31,11 +41,8 @@ class ShoppingCartPage extends React.Component{
   render() {
     return (
       <div>
-          <Typography component="h2" variant="h1" gutterBottom>
-              Sample User Shopping Cart:
-          </Typography>
-          {this.state.cart.map((item, i) => <p> {item._id} </p>)}
-          {this.state.cart.map((item, i) => <CardItem itemID={item._id}/>)}
+          <h1> Shopping Cart </h1>
+          {this.state.cart.length === 0 ? <p> No item in shopping cart </p> : this.state.cart.map((item, i) => <CardItem itemID={item._id}/>)}
 
       </div>
     )

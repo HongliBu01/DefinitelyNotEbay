@@ -181,7 +181,7 @@ class PrimarySearchAppBar extends React.Component {
           </IconButton>
           <p>Sell Item</p>
         </MenuItem></Link>
-        <Link exact to={`/users/${userID}/cart`} style={{ textDecoration: 'none' }}><MenuItem>
+        <Link exact to={`/cart`} style={{ textDecoration: 'none' }}><MenuItem>
           <IconButton>
             <ShoppingCartIcon />
           </IconButton>
@@ -220,7 +220,7 @@ class PrimarySearchAppBar extends React.Component {
                   <AddBoxIcon />
                 </IconButton>
               </Link>
-              <Link exact to={`/users/${userID}/cart`} style={{ textDecoration: 'none' }}>
+              <Link exact to={`/cart`} style={{ textDecoration: 'none' }}>
                 <IconButton>
                   <ShoppingCartIcon />
                 </IconButton>

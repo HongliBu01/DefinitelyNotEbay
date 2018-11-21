@@ -111,10 +111,10 @@ class EditUser extends React.Component {
           <br />
       </form>
       <Button onClick={()=>this.handleSubmit()}> Submit </Button>
-      <h2> {this.state.isActive ? Suspend Account : Activate Account }</h2>
-      <Button onClick={()=>this.suspendAccount()} {this.state.isActive ? Suspend : Activate } </Button>
+      {this.state.isActive ? <h2>Suspend Account</h2> : <h2>Activate Account</h2> }
+      <Button onClick={()=>this.suspendAccount('suspend')}>  {this.state.isActive ? 'Suspend' : 'Activate'}  </Button>
       <h2> Delete Account </h2>
-      <Button onClick={()=>this.deleteAccount()} Delete </Button>
+      <Button onClick={()=>this.deleteAccount()}> Delete </Button>
       </div>
     )
   }
