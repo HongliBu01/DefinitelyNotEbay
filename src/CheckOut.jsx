@@ -25,8 +25,8 @@ class CheckoutPage extends React.Component{
 
   handleTransaction() {
     // Remove everything from cart
-    // Remove from listings
-    // Remove from other user's carts and bidHistory
+    // Flag from listings isExpired
+    // Remove from other user's carts, watchlist
     // Store in user's buyHistory under timestamp
   }
 

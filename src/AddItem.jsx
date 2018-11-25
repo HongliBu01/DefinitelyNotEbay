@@ -34,6 +34,7 @@ const MenuProps = {
   },
 };
 // TODO: Sanitize inputs (prevent ending times in past)
+// TODO: Add active flag.
 class AddItem extends React.Component {
   constructor(props) {
     super(props);
@@ -113,7 +114,9 @@ class AddItem extends React.Component {
         startTime: this.state.startTime,
         endTime: this.state.endTime,
         reportFlag: false,
-        categories: this.state.selectedCategories
+        categories: this.state.selectedCategories,
+        soldFlag: false,
+        activeFlag: this.state.active
       })
     }).then(results => {
         return results.json()

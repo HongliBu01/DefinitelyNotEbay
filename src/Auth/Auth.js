@@ -23,12 +23,17 @@ export default class Auth {
 
   getProfile(callback) {
     let accessToken = this.getAccessToken();
-    this.auth0.client.userInfo(accessToken, (err, profile) => {
+    if (accessToken) {
+      this.auth0.client.userInfo(accessToken, (err, profile) => {
       if (profile) {
         this.userProfile = profile;
       }
-    callback(err, profile);
-    });
+      callback(err, profile);
+      });
+    } else {
+      return
+    }
+
   }
 
   getIdToken() {
@@ -38,7 +43,7 @@ export default class Auth {
   getAccessToken() {
     const accessToken = localStorage.getItem('access_token')
     if (!accessToken) {
-      throw new Error('No Access Token found')
+      console.log('No Access Token found')
     }
     return accessToken
   }
