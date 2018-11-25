@@ -107,7 +107,7 @@ def bid(item_id):
     new_bid = request.get_json(force=True)
     item = mongo.db.items.find_one({"_id": ObjectId(item_id)})
     # TODO: Store bid in user's bid history
-    # Append {bidAmount, _id}
+    # Append {bidAmount, _id, timestamp}
     if "bid_history" not in item:
         item["bid_history"] = [new_bid]
     else:
