@@ -39,8 +39,6 @@ class MainPage extends React.Component {
     };
 
     this.getItems = this.getItems.bind(this)
-    this.getCart = this.getCart.bind(this)
-    this.getWatchlist = this.getWatchlist.bind(this)
     this.getCategories = this.getCategories.bind(this)
     this.filterCategory = this.filterCategory.bind(this)
     this.handleChange = this.handleChange.bind(this)
@@ -49,8 +47,6 @@ class MainPage extends React.Component {
 
   componentWillMount() {
     this.getItems();
-    this.getCart();
-    this.getWatchlist();
     this.getCategories();
     // Handle user details
     const { userProfile, getProfile } = this.props.auth
@@ -133,14 +129,12 @@ class MainPage extends React.Component {
       })
     } else {
       this.state.allItems.forEach((item) => {
-        console.log(item)
         if (item.name.toLowerCase().startsWith(searchTerm.toLowerCase())) {
           currentItems.push(item)
         }
       })
     }
     this.setState({currentItems})
-    // console.log(currentItems)
   }
 
   filterCategory(selectedCategories) {
@@ -151,7 +145,6 @@ class MainPage extends React.Component {
       }
     })
     this.setState({currentItems})
-    console.log("CURRENT ITEMS", currentItems)
   }
   render() {
     // const {profile} = this.state

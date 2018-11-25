@@ -62,17 +62,18 @@ def handleUser(user_id):
   if request.method == 'PUT':
     newUser = request.get_json(force=True)
     user = mongo.db.users.find_one_and_update({"_id": user_id}, {"$set": newUser})
-    return 'OK'
+    return json.dumps(user, default=json_util.default)
 
   if request.method == 'DELETE':
-    mongo.db.users.delete_one({"_id": user_id})
-    return 'OK'
+    res = mongo.db.users.delete_one({"_id": user_id})
+    return json.dumps(res, default=json_util.default)
 
 
 # ITEM STUFF
 @app.route("/api/items", methods=['GET'])
 def findAllItems():
     items = []
+    # TODO: Check if time period has ended. If true, move item to last bidder's cart with type "bid" and mark not active
     for item in mongo.db.items.find():
         items.append(item)
     return json.dumps(items, default=json_util.default)
@@ -81,6 +82,7 @@ def findAllItems():
 def createItem():
     itemData = request.get_json(force=True)
     mongo.db.items.insert_one(itemData)
+    # TODO: append _id.$oid into itemData.seller's listings
     return json.dumps(itemData, default=json_util.default)
 
 @app.route("/api/items/<item_id>", methods=['GET', 'PUT', 'DELETE'])
@@ -104,6 +106,8 @@ def handleItem(item_id):
 def bid(item_id):
     new_bid = request.get_json(force=True)
     item = mongo.db.items.find_one({"_id": ObjectId(item_id)})
+    # TODO: Store bid in user's bid history
+    # Append {bidAmount, _id, timestamp}
     if "bid_history" not in item:
         item["bid_history"] = [new_bid]
     else:
@@ -113,6 +117,7 @@ def bid(item_id):
 
 
 # CART STUFF
+# TODO: Add edit functionality if it was buyNow type
 @app.route('/api/users/<user_id>/cart', methods=['GET', 'POST'])
 def cart(user_id):
     if request.method == 'GET':
@@ -174,7 +179,6 @@ def categories():
         category = request.get_json(force=True)
         current_categories = mongo.db.misc.find_one_or_404({"name": "categories"})
         current_categories["data"].append(category)
-        # res = mongo.db.misc.insert_one({"name": "categories", "data": {"clothes": 1}})
         res = mongo.db.misc.find_one_and_update({"name": "categories"}, {"$set": {"data": current_categories["data"]}})
         return json.dumps(res, default=json_util.default)
 
@@ -190,4 +194,3 @@ def catch_all(path):
 
 if __name__ == "__main__":
     socketio.run(app, host='0.0.0.0', port=os.environ.get('PORT', 3000), debug=True)
-    # app.run(host='0.0.0.0', port=os.environ.get('PORT', 3000), debug=True)

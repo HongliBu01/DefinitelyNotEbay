@@ -23,12 +23,17 @@ export default class Auth {
 
   getProfile(callback) {
     let accessToken = this.getAccessToken();
-    this.auth0.client.userInfo(accessToken, (err, profile) => {
+    if (accessToken) {
+      this.auth0.client.userInfo(accessToken, (err, profile) => {
       if (profile) {
         this.userProfile = profile;
       }
-    callback(err, profile);
-    });
+      callback(err, profile);
+      });
+    } else {
+      return
+    }
+
   }
 
   getIdToken() {
@@ -68,7 +73,10 @@ export default class Auth {
                 watchlist: [],
                 cart: [],
                 isActive: true,
-                isAdmin: false
+                isAdmin: false,
+                bidHistory: [],
+                buyHistory: [],
+                listings: []
               }
               // Add user to database
               fetch('/api/users', {

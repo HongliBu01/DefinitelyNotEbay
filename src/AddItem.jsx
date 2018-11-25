@@ -33,9 +33,8 @@ const MenuProps = {
     },
   },
 };
-// TODO: Sanitize inputs
-// TODO: Add userID
-// TODO: Redirect to item page
+// TODO: Sanitize inputs (prevent ending times in past)
+// TODO: Add active flag.
 class AddItem extends React.Component {
   constructor(props) {
     super(props);
@@ -97,6 +96,7 @@ class AddItem extends React.Component {
   };
 
   handleSubmit() {
+    // TODO: Handle check if auction is currently active (current time between start time and end time)
     fetch('/api/items', {
       method: 'POST',
       headers: {
@@ -114,13 +114,15 @@ class AddItem extends React.Component {
         startTime: this.state.startTime,
         endTime: this.state.endTime,
         reportFlag: false,
-        categories: this.state.selectedCategories
+        categories: this.state.selectedCategories,
+        soldFlag: false,
+        activeFlag: this.state.active
       })
     }).then(results => {
         return results.json()
       }).then(data => {
           if (data._id) {
-            this.setState({_id: data._id})
+            this.setState({_id: data._id.$oid})
             this.setState({redirect: true})
           }
       });

@@ -5,7 +5,11 @@ import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import moment from 'moment'
 
-// TODO: Set up button functionality
+import { withRouter, Redirect } from 'react-router';
+
+// TODO: Set up Report Item functionality
+// TODO: Prevent adding to cart and watchlist multiple times
+// TODO: Get user and don't allow bidding/buying if not active
 class ItemPage extends React.Component {
   constructor(props) {
     super(props);
@@ -28,7 +32,8 @@ class ItemPage extends React.Component {
       bidHistory: [],
       expired: false,
       remainingTime: "",
-      profile: {}
+      profile: {},
+      redirect: false
     }
     this.getItem = this.getItem.bind(this)
     this.handleChange = this.handleChange.bind(this)
@@ -113,7 +118,7 @@ class ItemPage extends React.Component {
     })
   }
 
-  addToCart() {
+  addToCart(price) {
     const userID = this.state.profile.sub
     fetch(`/api/users/${userID}/cart`, {
       method: 'POST',
@@ -122,12 +127,15 @@ class ItemPage extends React.Component {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        _id: this.state.itemID
+        _id: this.state.itemID,
+        price: price,
+        type: "buyNow"
       })
     }).then(results => {
       return results.json()
     }).then(data => {
         console.log(data)
+        this.setState({redirect: true})
     })
   }
 
@@ -160,6 +168,9 @@ class ItemPage extends React.Component {
   }
 
   render() {
+    if (this.state.redirect) {
+      return <Redirect push to={`/cart`} />;
+    }
     return (
       <div>
         <h1>{this.state.name}</h1>
@@ -188,7 +199,7 @@ class ItemPage extends React.Component {
         </form>
         <Button variant="contained" onClick={()=>this.handleBid()} disabled={!this.state.validBid}> Make Bid </Button>
         </div>: null}
-        {this.state.buyPrice !== "0.00" ? <div><p>Buy Price: ${this.state.buyPrice}</p><Button variant="contained" onClick={()=>this.addToCart()} disabled={!this.state.profile.hasOwnProperty('sub')}> Buy Now </Button></div> : ""}
+        {this.state.buyPrice !== "0.00" ? <div><p>Buy Price: ${this.state.buyPrice}</p><Button variant="contained" onClick={()=>this.addToCart(parseFloat(this.state.buyPrice) + parseFloat(this.state.shippingPrice))} disabled={!this.state.profile.hasOwnProperty('sub')}> Buy Now </Button></div> : ""}
         <p> Shipping price: ${this.state.shippingPrice} </p>
         <h4>Description</h4>
         {this.state.description}
