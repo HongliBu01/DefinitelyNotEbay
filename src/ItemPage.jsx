@@ -43,7 +43,7 @@ class ItemPage extends React.Component {
     this.addToCart = this.addToCart.bind(this)
     this.addToWatchlist = this.addToWatchlist.bind(this)
     this.reportItem = this.reportItem.bind(this)
-    // remove from watch list - zhenghong
+    // remove from watch list - zhenghong - finished
     this.removeFromWatchlist = this.removeFromWatchlist.bind(this)
   }
 
@@ -158,10 +158,21 @@ class ItemPage extends React.Component {
   }
 
   removeFromWatchlist() {
-      // Not implemented yet
-      // TODO: implement this.removeFromWatchlist(), probably import from Card Item?
-      console.log("triggering remove from watchlist")
-  }
+        const itemID = this.state.itemID;
+        const userID = this.state.profile.sub;
+        this.setState({itemID: itemID,
+                             userID: userID});
+        fetch(`/api/users/${userID}/watchlist/${itemID}`,
+            {method: "DELETE",})
+            .then(results => {
+                return results.json() // route definition says its the user object (server.py: 157)
+            }).then(data => {
+                this.setState({...data})
+                console.log(data)
+                location.reload()
+                // refresh page was intended to make watchlist have new state. but may not necessary here.
+        })
+    }
 
   reportItem() {
     console.log("REPORT")

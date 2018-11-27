@@ -159,8 +159,9 @@ def watchlist(user_id):
 def delete_watchlist_item(user_id, item_id):
     watchlist = mongo.db.users.find_one({"_id": user_id})["watchlist"]
     item_id = {"_id": item_id}
+    print(watchlist)
     if item_id in watchlist:
-        watchlist.remove({"_id": item_id})
+        watchlist.remove(item_id)
         res = mongo.db.users.find_one_and_update({"_id": user_id}, {"$set": {"watchlist": watchlist}})
     else:
         res = mongo.db.users.find_one({"_id": user_id}) # TODO: Why this????

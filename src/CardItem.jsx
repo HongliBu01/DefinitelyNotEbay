@@ -45,7 +45,8 @@ class CardItem extends React.Component {
             remainingTime: ""
         };
         this.getItem = this.getItem.bind(this)
-        this.removeFromWatchlist = this.removeFromWatchlist.bind(this)
+        // removed
+        // this.removeFromWatchlist = this.removeFromWatchlist.bind(this)
     }
 
     componentWillMount() {
@@ -69,10 +70,7 @@ class CardItem extends React.Component {
         })
     }
 
-    removeFromWatchlist() {
-        console.log("triggering remove from watchlist")
-        //TODO: implement this.removeFromWatchlist(), probably import from Item Page?
-    }
+    // remove from watchlist is not in item page
 
     render() {
         return (
@@ -100,9 +98,9 @@ class CardItem extends React.Component {
                 <CardActions>
                     <Link to={`/item/${this.state.itemID }`|| null} style={{ textDecoration: 'none' }}><Button size="small">Learn More</Button></Link>
                 </CardActions>
-                <CardActions>
-                    <Button onClick={()=>this.removeFromWatchlist()} size="small">Remove From Watchlist</Button>
-                </CardActions>
+                {/*<CardActions>*/}
+                    {/*<Button onClick={()=>this.removeFromWatchlist()} size="small">Remove From Watchlist</Button>*/}
+                {/*</CardActions> this should not be here.*/}
             </Card>
         );
     }
