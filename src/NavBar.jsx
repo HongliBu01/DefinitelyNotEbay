@@ -20,7 +20,7 @@ import HomeIcon from '@material-ui/icons/Home';
 import AddBoxIcon from '@material-ui/icons/AddBox';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import Auth from "./Auth/Auth";
-import { connect } from './Socket/socketConnect.js'
+import { connect, emit } from './Socket/socketConnect.js'
 import Notifications from './Notifications.jsx'
 
 const styles = theme => ({
@@ -139,8 +139,10 @@ class PrimarySearchAppBar extends React.Component {
     if (this.state.profile) {
       if (message.userID === this.state.profile.sub) {
         // Check if this message belongs to user then update notifications
-        this.setState({"notifications": this.state.notifications.push(message)})
+        this.state.notifications.push(message)
         this.setState({"notificationCounter": this.state.notificationCounter+1})
+        // Store in database
+        emit('newNotification', data)
       }
     }
   }

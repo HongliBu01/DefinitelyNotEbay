@@ -188,37 +188,19 @@ def notificationsRead(user_id):
     mongo.db.users.find_one_and_update({"_id": user_id}, {"$set": user})
     return json.dumps(notifications, default=json_util.default)
 
-
-@socketio.on('newNotification')
-def handle_notification(notification):
-    #receive new notification
-    print("RECEIVED", notification)
-    new_notification = json.loads(notification)
-    # Emit notification
-    emit("alert", notification, broadcast=True)
-    # Store notification in user's db
-    user_id = new_notification.pop("userID")
-    user = mongo.db.users.find_one({"_id": new_bid["userID"]})
-    user["notifications"].append(new_notification)
-    mongo.db.users.find_one_and_update({"_id": new_bid["userID"]}, {"$set": user})
-
 @socketio.on('bid')
 def handle_bid(bid):
     print("RECEIVED BID!" + str(bid))
     #Handle bid
     new_bid = json.loads(bid)
-    item_id = new_bid.pop('itemID')
+    item_id = new_bid['itemID']
     item = mongo.db.items.find_one({"_id": ObjectId(item_id)})
     user = mongo.db.users.find_one({"_id": new_bid["userID"]})
-    print("ITEM", item)
-    print("USER", user)
-    # Append {bidAmount, _id, timestamp}
     if len(item["bid_history"]) == 0:
         item["bid_history"] = [new_bid]
         #Store in user's bidHistory
         user["bidHistory"].append(new_bid)
         mongo.db.users.find_one_and_update({"_id": new_bid["userID"]}, {"$set": user})
-        print("BID HISTORE", item)
         mongo.db.items.find_one_and_update({"_id": ObjectId(item_id)}, {"$set": item})
     else:
         #Validate bid
@@ -229,14 +211,30 @@ def handle_bid(bid):
             #Store in user's bidHistory
             user["bidHistory"].append(new_bid)
             mongo.db.users.find_one_and_update({"_id": new_bid["userID"]}, {"$set": user})
-            print("BID HISTORY", item)
             mongo.db.items.find_one_and_update({"_id": ObjectId(item_id)}, {"$set": item})
+            # Alert person who has been outbid
+            alert = {"userID": last_item["userID"], "message": "You have been outbid for " + item["name"] + ".", "timestamp": time.time()*1000, "read": False}
+            print("ALERT PREVIOUS BIDDER", alert)
+            emit('alert', json.dumps(alert), broadcast=True)
     # Alert seller
-    alert = {"userID": item["seller"], "message": "Your item " + item["name"] + " has received a bid.", "timestamp": time.time(), "read": False}
+    alert = {"userID": item["seller"], "message": "Your item " + item["name"] + " has received a bid.", "timestamp": time.time()*1000, "read": False}
     print("ALERT SELLER", alert)
-    emit('newNotification', json.dumps(alert), broadcast=True)
+    emit('alert', json.dumps(alert), broadcast=True)
+
+
     #broadcast data to all clients
     emit('bid', bid, broadcast=True)
+
+@socketio.on('newNotification')
+def handle_notification(notification):
+    #receive new notification
+    print("RECEIVED", notification)
+    new_notification = json.loads(notification)
+    # Store notification in user's db
+    user_id = new_notification.pop("userID")
+    user = mongo.db.users.find_one({"_id": user_id})
+    user["notifications"].append(new_notification)
+    mongo.db.users.find_one_and_update({"_id": user_id}, {"$set": user})
 
 @app.route('/<path:path>')
 def catch_all(path):
