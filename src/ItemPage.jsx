@@ -196,7 +196,21 @@ class ItemPage extends React.Component {
     }
 
   reportItem() {
-    console.log("REPORT")
+    const itemID = this.state.itemID;
+    fetch(`/api/items/${itemID}`, {
+      method: "PUT",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        reportFlag: true
+      })
+    }).then(results => {
+      return results.json()
+    }).then(data => {
+      console.log(data)
+    })
   }
 
   render() {
