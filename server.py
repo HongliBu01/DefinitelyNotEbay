@@ -182,10 +182,10 @@ def categories():
 def notificationsRead(user_id):
     user = mongo.db.users.find_one({"_id": user_id})
     notifications = user["notifications"]
-    for i in len(notifications):
+    for i in range(len(notifications)):
         notifications[i]["read"] = True
     user["notifications"] = notifications
-    mongo.db.items.find_one_and_update({"_id": user_id}, {"$set": user})
+    mongo.db.users.find_one_and_update({"_id": user_id}, {"$set": user})
     return json.dumps(notifications, default=json_util.default)
 
 
@@ -210,9 +210,16 @@ def handle_bid(bid):
     item_id = new_bid.pop('itemID')
     item = mongo.db.items.find_one({"_id": ObjectId(item_id)})
     user = mongo.db.users.find_one({"_id": new_bid["userID"]})
+    print("ITEM", item)
+    print("USER", user)
     # Append {bidAmount, _id, timestamp}
-    if "bid_history" not in item:
+    if len(item["bid_history"]) == 0:
         item["bid_history"] = [new_bid]
+        #Store in user's bidHistory
+        user["bidHistory"].append(new_bid)
+        mongo.db.users.find_one_and_update({"_id": new_bid["userID"]}, {"$set": user})
+        print("BID HISTORE", item)
+        mongo.db.items.find_one_and_update({"_id": ObjectId(item_id)}, {"$set": item})
     else:
         #Validate bid
         last_item = item["bid_history"][-1]
@@ -222,11 +229,12 @@ def handle_bid(bid):
             #Store in user's bidHistory
             user["bidHistory"].append(new_bid)
             mongo.db.users.find_one_and_update({"_id": new_bid["userID"]}, {"$set": user})
-            # Alert seller
-            alert = {"userID": item["seller"], "message": "Your item " + item["name"] + " has received a bid.", "timestamp": time.time(), "read": False}
-            print("ALERT SELLER", alert)
-            emit('newNotification', json.dumps(alert), broadcast=True)
-    mongo.db.items.find_one_and_update({"_id": ObjectId(item_id)}, {"$set": item})
+            print("BID HISTORY", item)
+            mongo.db.items.find_one_and_update({"_id": ObjectId(item_id)}, {"$set": item})
+    # Alert seller
+    alert = {"userID": item["seller"], "message": "Your item " + item["name"] + " has received a bid.", "timestamp": time.time(), "read": False}
+    print("ALERT SELLER", alert)
+    emit('newNotification', json.dumps(alert), broadcast=True)
     #broadcast data to all clients
     emit('bid', bid, broadcast=True)
 

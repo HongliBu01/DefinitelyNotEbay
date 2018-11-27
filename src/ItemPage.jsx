@@ -63,7 +63,7 @@ class ItemPage extends React.Component {
   }
 
   socketUpdateBid(data) {
-    console.log('GOT NEW BID', JSON.parse(data).bidPrice)
+    this.setState({bidHistory: this.state.bidHistory.push(JSON.parse(data))})
     this.setState({startPrice: JSON.parse(data).bidPrice})
   }
 
@@ -85,8 +85,9 @@ class ItemPage extends React.Component {
         return results.json()
       }).then(data => {
         this.setState({...data})
+        this.setState({bidHistory: data.bid_history})
         if (this.state.bidHistory.length > 0) {
-          this.setState({startingPrice: this.state.bidHistory[this.state.bidHistory.length-1]})
+          this.setState({startPrice: this.state.bidHistory[this.state.bidHistory.length-1].bidPrice})
         }
         if (moment(Date.now()).isAfter(moment(this.state.endTime))) {
           this.setState({expired: true})

@@ -37,7 +37,7 @@ class Notifications extends React.Component {
         return (
             <div style={{width: 500, right:0, position: "fixed"}}>
             {this.props.notifications.reverse().map((notification, i) =>
-            (<Card key={i} style={{backgroundColor: {notification.read ? "white" : "#e6ffff"}}}>
+            (<Card key={i} style={{backgroundColor: notification.read ? "white" : "#e6ffff"}}>
                 <CardContent>
                     <Typography component="p">
                     {notification.message}
