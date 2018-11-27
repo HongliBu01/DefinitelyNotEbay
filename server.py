@@ -1,15 +1,26 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+#Monkey patch for flask socketio
+try:
+    from eventlet import monkey_patch as monkey_patch
+    monkey_patch()
+except ImportError:
+    try:
+        from gevent.monkey import patch_all
+        patch_all()
+    except ImportError:
+        pass
+
 import os
 import json
-import datetime
+import datetime, time
 import config
 from bson.objectid import ObjectId
 from bson import json_util
 from flask import Flask, render_template, request
 from flask_pymongo import PyMongo
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, send, emit
 
 
 class JSONEncoder(json.JSONEncoder):
@@ -183,9 +194,63 @@ def categories():
         res = mongo.db.misc.find_one_and_update({"name": "categories"}, {"$set": {"data": current_categories["data"]}})
         return json.dumps(res, default=json_util.default)
 
-@socketio.on('seller alert')
-def handle_seller_alert(json):
-    print('Received json: ' + str(json))
+@app.route('/api/users/<user_id>/notifications', methods=['POST'])
+def notificationsRead(user_id):
+    user = mongo.db.users.find_one({"_id": user_id})
+    notifications = user["notifications"]
+    for i in range(len(notifications)):
+        notifications[i]["read"] = True
+    user["notifications"] = notifications
+    mongo.db.users.find_one_and_update({"_id": user_id}, {"$set": user})
+    return json.dumps(notifications, default=json_util.default)
+
+@socketio.on('bid')
+def handle_bid(bid):
+    print("RECEIVED BID!" + str(bid))
+    #Handle bid
+    new_bid = json.loads(bid)
+    item_id = new_bid['itemID']
+    item = mongo.db.items.find_one({"_id": ObjectId(item_id)})
+    user = mongo.db.users.find_one({"_id": new_bid["userID"]})
+    if len(item["bid_history"]) == 0:
+        item["bid_history"] = [new_bid]
+        #Store in user's bidHistory
+        user["bidHistory"].append(new_bid)
+        mongo.db.users.find_one_and_update({"_id": new_bid["userID"]}, {"$set": user})
+        mongo.db.items.find_one_and_update({"_id": ObjectId(item_id)}, {"$set": item})
+    else:
+        #Validate bid
+        last_item = item["bid_history"][-1]
+        if int(last_item["bidTime"]) < int(new_bid["bidTime"]) and float(last_item["bidPrice"]) < float(new_bid["bidPrice"]):
+            # Only append bid if timestamp is newer and new bid must be greater
+            item["bid_history"].append(new_bid)
+            #Store in user's bidHistory
+            user["bidHistory"].append(new_bid)
+            mongo.db.users.find_one_and_update({"_id": new_bid["userID"]}, {"$set": user})
+            mongo.db.items.find_one_and_update({"_id": ObjectId(item_id)}, {"$set": item})
+            # Alert person who has been outbid
+            alert = {"userID": last_item["userID"], "message": "You have been outbid for " + item["name"] + ".", "timestamp": time.time()*1000, "read": False}
+            print("ALERT PREVIOUS BIDDER", alert)
+            emit('alert', json.dumps(alert), broadcast=True)
+    # Alert seller
+    alert = {"userID": item["seller"], "message": "Your item " + item["name"] + " has received a bid.", "timestamp": time.time()*1000, "read": False}
+    print("ALERT SELLER", alert)
+    emit('alert', json.dumps(alert), broadcast=True)
+
+
+    #broadcast data to all clients
+    emit('bid', bid, broadcast=True)
+
+@socketio.on('newNotification')
+def handle_notification(notification):
+    #receive new notification
+    print("RECEIVED", notification)
+    new_notification = json.loads(notification)
+    # Store notification in user's db
+    user_id = new_notification.pop("userID")
+    user = mongo.db.users.find_one({"_id": user_id})
+    user["notifications"].append(new_notification)
+    mongo.db.users.find_one_and_update({"_id": user_id}, {"$set": user})
 
 @app.route('/<path:path>')
 def catch_all(path):
