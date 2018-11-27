@@ -71,7 +71,8 @@ class ItemPage extends React.Component {
     const data = JSON.stringify({
         userID: this.state.profile.sub,
         bidPrice: this.state.bidPrice,
-        bidTime: Date.now()
+        bidTime: Date.now(),
+        itemID: this.state.itemID
       })
     emit('bid', data)
   }

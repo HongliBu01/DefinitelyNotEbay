@@ -183,10 +183,31 @@ def handle_seller_alert(json):
     print('Received json: ' + str(json))
 
 @socketio.on('bid')
-def handle_bid(json):
-    #broadcast data
-    print("RECEIVED BID!" + str(json))
-    emit('bid', json, broadcast=True)
+def handle_bid(bid):
+    print("RECEIVED BID!" + str(bid))
+    #Handle bid
+    new_bid = json.loads(bid)
+    print("NEW BID", new_bid)
+    item_id = new_bid.pop('itemID')
+    item = mongo.db.items.find_one({"_id": ObjectId(item_id)})
+    user = mongo.db.users.find_one({"_id": new_bid["userID"]})
+    print(item)
+    # Append {bidAmount, _id, timestamp}
+    if "bid_history" not in item:
+        item["bid_history"] = [new_bid]
+    else:
+        #Validate bid
+        last_item = item["bid_history"][-1]
+        if int(last_item["bidTime"]) < int(new_bid["bidTime"]) and float(last_item["bidPrice"]) < float(new_bid["bidTime"]):
+            # Only append bid if timestamp is newer and new bid must be greater
+            item["bid_history"].append(new_bid)
+            #Store in user's bidHistory
+            user["bidHistory"].append(new_bid)
+            mongo.db.users.find_one_and_update({"_id": new_bid["userID"]}, {"$set": user})
+    print("NEW ITEM", item)
+    mongo.db.items.find_one_and_update({"_id": ObjectId(item_id)}, {"$set": item})
+    #broadcast data to all clients
+    emit('bid', bid, broadcast=True)
 
 @app.route('/<path:path>')
 def catch_all(path):
