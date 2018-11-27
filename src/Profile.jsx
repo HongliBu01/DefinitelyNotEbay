@@ -58,7 +58,7 @@ class Profile extends React.Component {
   render() {
     return (
       <div>
-        {this.state.profile.hasOwnProperty(sub) ?
+        {this.state.profile ?
         <div><h1> User Profile </h1>
         <p> Email: {this.state.profile.email}</p>
         <p> Active: {String(this.state.isActive)} </p>

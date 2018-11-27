@@ -64,7 +64,7 @@ class ItemPage extends React.Component {
   }
 
   socketUpdateBid(data) {
-    this.setState({bidHistory: this.state.bidHistory.push(JSON.parse(data))})
+    this.state.bidHistory.push(JSON.parse(data))
     this.setState({startPrice: JSON.parse(data).bidPrice})
   }
 
