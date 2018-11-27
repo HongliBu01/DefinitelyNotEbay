@@ -108,6 +108,8 @@ class PrimarySearchAppBar extends React.Component {
     };
     this.toggleNotifications = this.toggleNotifications.bind(this)
     this.getUser = this.getUser.bind(this)
+    this.handleNewNotification = this.handleNewNotification.bind(this)
+    this.markRead = this.markRead.bind(this)
   }
 
   componentWillMount() {
@@ -115,14 +117,30 @@ class PrimarySearchAppBar extends React.Component {
     if (!userProfile) {
       getProfile((err, profile) => {
         this.setState({profile})
-        this.getUser(profile.sub) // Get notifications
+        if (profile) {
+          this.getUser(profile.sub) // Get notifications
+        }
       })
     } else {
       this.setState({ profile: userProfile })
-      this.getUser(userProfile.sub) // Get notifications
+      if (userProfile) {
+        this.getUser(userProfile.sub) // Get notifications
+      }
     }
     // Append notifications when received
-    connect('alert',(message) => this.setState({"notifications": this.state.notifications.push(message)}))
+    connect('alert',(message) => this.handleNewNotification(message))
+  }
+
+  handleNewNotification(data) {
+    const message = JSON.parse(data)
+    // Check if user is logged in
+    if (this.state.profile) {
+      if (message.userID === this.state.profile.sub) {
+        // Check if this message belongs to user then update notifications
+        this.setState({"notifications": this.state.notifications.push(message)}))
+        this.setState({"notificationCounter": this.state.notificationCounter+1})
+      }
+    }
   }
 
   getUser(userID) {
@@ -130,10 +148,8 @@ class PrimarySearchAppBar extends React.Component {
       .then(results => {
         return results.json()
       }).then(data => {
-        console.log(data)
         this.setState({notifications: data.notifications})
         this.setState({notificationCounter: this.state.notifications.filter((notification) => !notification.read).length})
-        console.log("set state", this.state.notificationCounter)
     })
   }
 
@@ -163,10 +179,35 @@ class PrimarySearchAppBar extends React.Component {
   };
 
   toggleNotifications() {
-    // If opening notifications, set all as read
+    // If closing notifications and there exists new notification
+    if (this.state.showNotifications && this.state.notificationCounter > 0) {
+      // Set all as read
+      this.state.notifications.map((notification) => {
+        if (!notification.read) {
+          notification.read = !notification.read
+        }
+      })
+      // Update database
+      this.markRead()
+    }
     this.setState({showNotifications: !this.state.showNotifications})
   }
 
+  markRead() {
+    handleSubmit() {
+    fetch(`/api/users/${this.state.profile.sub}/notifications`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      }
+    }).then(results => {
+        return results.json()
+      }).then(data => {
+          console.log("READ DATA", data)
+      });
+  }
+  }
   render() {
     const { anchorEl, mobileMoreAnchorEl } = this.state;
     const { classes } = this.props;

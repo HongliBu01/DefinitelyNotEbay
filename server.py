@@ -14,7 +14,7 @@ except ImportError:
 
 import os
 import json
-import datetime
+import datetime, time
 import config
 from bson.objectid import ObjectId
 from bson import json_util
@@ -178,9 +178,29 @@ def categories():
         res = mongo.db.misc.find_one_and_update({"name": "categories"}, {"$set": {"data": current_categories["data"]}})
         return json.dumps(res, default=json_util.default)
 
-@socketio.on('seller alert')
-def handle_seller_alert(json):
-    print('Received json: ' + str(json))
+@app.route('/api/users/<user_id>/notifications', methods=['POST'])
+def notificationsRead(user_id):
+    user = mongo.db.users.find_one({"_id": user_id})
+    notifications = user["notifications"]
+    for i in len(notifications):
+        notifications[i]["read"] = True
+    user["notifications"] = notifications
+    mongo.db.items.find_one_and_update({"_id": user_id}, {"$set": user})
+    return json.dumps(notifications, default=json_util.default)
+
+
+@socketio.on('newNotification')
+def handle_notification(notification):
+    #receive new notification
+    print("RECEIVED", notification)
+    new_notification = json.loads(notification)
+    # Emit notification
+    emit("alert", notification, broadcast=True)
+    # Store notification in user's db
+    user_id = new_notification.pop("userID")
+    user = mongo.db.users.find_one({"_id": new_bid["userID"]})
+    user["notifications"].append(new_notification)
+    mongo.db.users.find_one_and_update({"_id": new_bid["userID"]}, {"$set": user})
 
 @socketio.on('bid')
 def handle_bid(bid):
@@ -202,6 +222,10 @@ def handle_bid(bid):
             #Store in user's bidHistory
             user["bidHistory"].append(new_bid)
             mongo.db.users.find_one_and_update({"_id": new_bid["userID"]}, {"$set": user})
+            # Alert seller
+            alert = {"userID": item["seller"], "message": "Your item " + item["name"] + " has received a bid.", "timestamp": time.time(), "read": False}
+            print("ALERT SELLER", alert)
+            emit('newNotification', json.dumps(alert), broadcast=True)
     mongo.db.items.find_one_and_update({"_id": ObjectId(item_id)}, {"$set": item})
     #broadcast data to all clients
     emit('bid', bid, broadcast=True)
