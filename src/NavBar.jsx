@@ -228,9 +228,9 @@ class PrimarySearchAppBar extends React.Component {
         </MenuItem></Link>
         <MenuItem>
           <IconButton>
-            <Badge badgeContent={this.state.notificationCounter} color="secondary">
+            {this.state.notificationCounter > 0 ? <Badge badgeContent={this.state.notificationCounter} color="secondary">
               <NotificationsIcon onClick={()=> this.toggleNotifications()}/>
-            </Badge>
+            </Badge>: <NotificationsIcon onClick={()=> this.toggleNotifications()}/>}
           </IconButton>
           <p>Notifications</p>
         </MenuItem>
@@ -265,9 +265,9 @@ class PrimarySearchAppBar extends React.Component {
                 </IconButton>
               </Link>
               <IconButton>
-                <Badge badgeContent={this.state.notificationCounter} color="secondary">
-                  <NotificationsIcon onClick={()=> this.toggleNotifications()}/>
-                </Badge>
+                {this.state.notificationCounter > 0 ? <Badge badgeContent={this.state.notificationCounter} color="secondary">
+              <NotificationsIcon onClick={()=> this.toggleNotifications()}/>
+            </Badge>: <NotificationsIcon onClick={()=> this.toggleNotifications()}/>}
               </IconButton>
               <IconButton
                 aria-owns={isMenuOpen ? 'material-appbar' : undefined}

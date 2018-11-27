@@ -36,12 +36,14 @@ class Notifications extends React.Component {
     render() {
         return (
             <div style={{width: 500, right:0, position: "fixed"}}>
-            {this.props.notifications.map((notification, i) =>
-            (<Card key={i}>
+            {this.props.notifications.reverse().map((notification, i) =>
+            (<Card key={i} style={{backgroundColor: {notification.read ? "white" : "#e6ffff"}}}>
                 <CardContent>
-                    <Typography variant="h5" component="h2">
-                        {notification.message}
-                        {notification.timestamp}
+                    <Typography component="p">
+                    {notification.message}
+                    </Typography>
+                    <Typography color="textSecondary">
+                    {moment.duration(moment(notification.timestamp).diff(moment(Date.now()))).humanize()}
                     </Typography>
                 </CardContent>
             </Card>))}
