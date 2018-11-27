@@ -61,6 +61,10 @@ class CardItem extends React.Component {
                 return results.json()
             }).then(data => {
             this.setState({...data})
+            this.setState({bidHistory: data.bid_history})
+            if (this.state.bidHistory.length > 0) {
+              this.setState({startPrice: this.state.bidHistory[this.state.bidHistory.length-1].bidPrice})
+            }
             if (moment(Date.now()).isAfter(moment(this.state.endTime))) {
               this.setState({remainingTime: "Expired"})
             } else {
