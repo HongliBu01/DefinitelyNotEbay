@@ -214,5 +214,3 @@ Temporary Items
 .idea/vcs.xml
 .idea/codeStyles/codeStyleConfig.xml
 
-# ignoring yourself
-.gitignore
