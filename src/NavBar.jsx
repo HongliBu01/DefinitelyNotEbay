@@ -1,5 +1,4 @@
 import React from 'react';
-
 import { Link } from 'react-router-dom'
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -21,6 +20,8 @@ import HomeIcon from '@material-ui/icons/Home';
 import AddBoxIcon from '@material-ui/icons/AddBox';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import Auth from "./Auth/Auth";
+import { connect } from './Socket/socketConnect.js'
+import Notifications from './Notifications.jsx'
 
 const styles = theme => ({
   root: {
@@ -100,7 +101,40 @@ class PrimarySearchAppBar extends React.Component {
     this.state = {
       anchorEl: null,
       mobileMoreAnchorEl: null,
+      notifications: [],
+      profile: "",
+      showNotifications: false,
+      notificationCounter: 0
     };
+    this.toggleNotifications = this.toggleNotifications.bind(this)
+    this.getUser = this.getUser.bind(this)
+  }
+
+  componentWillMount() {
+    const { userProfile, getProfile } = this.props.auth
+    if (!userProfile) {
+      getProfile((err, profile) => {
+        this.setState({profile})
+        this.getUser(profile.sub) // Get notifications
+      })
+    } else {
+      this.setState({ profile: userProfile })
+      this.getUser(userProfile.sub) // Get notifications
+    }
+    // Append notifications when received
+    connect('alert',(message) => this.setState({"notifications": this.state.notifications.push(message)}))
+  }
+
+  getUser(userID) {
+    fetch(`/api/users/${userID}`)
+      .then(results => {
+        return results.json()
+      }).then(data => {
+        console.log(data)
+        this.setState({notifications: data.notifications})
+        this.setState({notificationCounter: this.state.notifications.filter((notification) => !notification.read).length})
+        console.log("set state", this.state.notificationCounter)
+    })
   }
 
   login() {
@@ -127,6 +161,11 @@ class PrimarySearchAppBar extends React.Component {
   handleMobileMenuClose = () => {
     this.setState({ mobileMoreAnchorEl: null });
   };
+
+  toggleNotifications() {
+    // If opening notifications, set all as read
+    this.setState({showNotifications: !this.state.showNotifications})
+  }
 
   render() {
     const { anchorEl, mobileMoreAnchorEl } = this.state;
@@ -189,8 +228,8 @@ class PrimarySearchAppBar extends React.Component {
         </MenuItem></Link>
         <MenuItem>
           <IconButton>
-            <Badge badgeContent={11} color="secondary">
-              <NotificationsIcon />
+            <Badge badgeContent={this.state.notificationCounter} color="secondary">
+              <NotificationsIcon onClick={()=> this.toggleNotifications()}/>
             </Badge>
           </IconButton>
           <p>Notifications</p>
@@ -226,8 +265,8 @@ class PrimarySearchAppBar extends React.Component {
                 </IconButton>
               </Link>
               <IconButton>
-                <Badge badgeContent={0} color="secondary">
-                  <NotificationsIcon />
+                <Badge badgeContent={this.state.notificationCounter} color="secondary">
+                  <NotificationsIcon onClick={()=> this.toggleNotifications()}/>
                 </Badge>
               </IconButton>
               <IconButton
@@ -245,6 +284,7 @@ class PrimarySearchAppBar extends React.Component {
             </div>
           </Toolbar>
         </AppBar>
+        {this.state.showNotifications && this.state.notifications.length > 0 ? <Notifications notifications={this.state.notifications} /> : null}
         {!isAuthenticated() && renderMenuNotAuth}
         {isAuthenticated() && renderMenuIsAuth}
         {renderMobileMenu}

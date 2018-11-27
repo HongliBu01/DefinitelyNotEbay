@@ -74,7 +74,8 @@ export default class Auth {
                 isAdmin: false,
                 bidHistory: [],
                 buyHistory: [],
-                listings: []
+                listings: [],
+                notifications: []
               }
               // Add user to database
               fetch('/api/users', {
