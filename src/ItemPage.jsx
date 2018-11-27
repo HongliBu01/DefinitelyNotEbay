@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom';
+import { Link } from 'react-router-dom'
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
@@ -166,6 +167,7 @@ class ItemPage extends React.Component {
     return (
       <div>
         <h1>{this.state.name}</h1>
+
         <p> Quantity: {this.state.quantity}</p>
         <p> Time Left: {this.state.expired ? "Auction has ended" : this.state.remainingTime} </p>
         <p> Bid Price: ${this.state.startPrice} </p>
@@ -200,6 +202,13 @@ class ItemPage extends React.Component {
         <br />
         <Button variant="contained" onClick={()=>this.addToWatchlist()}>Add to Watchlist </Button>
         <Button variant="contained" onClick={()=>this.reportItem()}>Report Item </Button>
+
+         {this.state.seller != this.state.profile.sub ? null :
+            <p><h2> Edit Item </h2>
+            <Link to={`/item/${this.state.itemID}/edit`} style={{ textDecoration: 'none' }}><Button variant="contained"> Edit Item </Button></Link>
+            </p>
+        }
+
       </div>
     )
   }
