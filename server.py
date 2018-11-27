@@ -1,6 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+#Monkey patch for flask socketio
+try:
+    from eventlet import monkey_patch as monkey_patch
+    monkey_patch()
+except ImportError:
+    try:
+        from gevent.monkey import patch_all
+        patch_all()
+    except ImportError:
+        pass
+
 import os
 import json
 import datetime
@@ -9,7 +20,7 @@ from bson.objectid import ObjectId
 from bson import json_util
 from flask import Flask, render_template, request
 from flask_pymongo import PyMongo
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, send, emit
 
 
 class JSONEncoder(json.JSONEncoder):
@@ -170,6 +181,12 @@ def categories():
 @socketio.on('seller alert')
 def handle_seller_alert(json):
     print('Received json: ' + str(json))
+
+@socketio.on('bid')
+def handle_bid(json):
+    #broadcast data
+    print("RECEIVED BID!" + str(json))
+    emit('bid', json, broadcast=True)
 
 @app.route('/<path:path>')
 def catch_all(path):
