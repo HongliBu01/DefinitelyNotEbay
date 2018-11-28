@@ -12,6 +12,7 @@ import Callback from './Callback/Callback';
 import WatchListPage from './WatchListPage.jsx'
 import ShoppingCartPage from './ShoppingCartPage.jsx'
 import AdminMainPage from './AdminMain.jsx'
+import CheckoutPage from './CheckOut.jsx'
 
 class App extends React.Component {
   render() {
@@ -34,7 +35,7 @@ class App extends React.Component {
           <Route exact path="/watchlist" render={(props) => <WatchListPage auth={auth} {...props}/>} />
           <Route exact path="/account" render={(props) => <EditUser auth={auth} {...props}/>} />
           <Route exact path="/cart" render={(props) => <ShoppingCartPage auth={auth} {...props}/>} />
-          <Route exact path="/checkout" render={(props) => <ShoppingCartPage auth={auth} {...props}/>} />
+          <Route exact path="/checkout" render={(props) => <CheckoutPage auth={auth} {...props}/>} />
           <Route exact path="/admin/users" render={(props) => <UserPage auth={auth} {...props}/>} />
           <Route exact path="/admin/listings" render={(props) => <AdminMainPage auth={auth} {...props}/>} />
           <Route exact path="/admin/flags" render={(props) => <AdminMainPage auth={auth} {...props}/>} />
