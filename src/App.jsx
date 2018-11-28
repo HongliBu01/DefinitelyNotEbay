@@ -24,7 +24,7 @@ class App extends React.Component {
 
     return (
       <div>
-        <PrimarySearchAppBar/>
+        <PrimarySearchAppBar auth={auth}/>
         <Switch>
           <Route exact path="/" render={(props) => <MainPage auth={auth} />} />
           <Route path="/addItem" render={(props) => <AddItem auth={auth} />} />

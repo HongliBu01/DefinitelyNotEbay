@@ -1,5 +1,4 @@
 import React from 'react';
-
 import { Link } from 'react-router-dom'
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -21,6 +20,8 @@ import HomeIcon from '@material-ui/icons/Home';
 import AddBoxIcon from '@material-ui/icons/AddBox';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import Auth from "./Auth/Auth";
+import { connect, emit } from './Socket/socketConnect.js'
+import Notifications from './Notifications.jsx'
 
 const styles = theme => ({
   root: {
@@ -100,7 +101,61 @@ class PrimarySearchAppBar extends React.Component {
     this.state = {
       anchorEl: null,
       mobileMoreAnchorEl: null,
+      notifications: [],
+      profile: "",
+      showNotifications: false,
+      notificationCounter: 0
     };
+    this.toggleNotifications = this.toggleNotifications.bind(this)
+    this.getUser = this.getUser.bind(this)
+    this.handleNewNotification = this.handleNewNotification.bind(this)
+    this.markRead = this.markRead.bind(this)
+  }
+
+  componentWillMount() {
+    const { userProfile, getProfile } = this.props.auth
+    if (!userProfile) {
+      getProfile((err, profile) => {
+        this.setState({profile})
+        console.log(profile)
+        if (profile) {
+          this.getUser(profile.sub) // Get notifications
+        }
+      })
+    } else {
+      this.setState({ profile: userProfile })
+      console.log(userProfile)
+      if (userProfile) {
+        this.getUser(userProfile.sub) // Get notifications
+      }
+    }
+    // Append notifications when received
+    connect('alert',(message) => this.handleNewNotification(message))
+  }
+
+  handleNewNotification(data) {
+    const message = JSON.parse(data)
+    // Check if user is logged in
+    if (this.state.profile) {
+      if (message.userID === this.state.profile.sub) {
+        // Check if this message belongs to user then update notifications
+        this.state.notifications.push(message)
+        this.setState({"notificationCounter": this.state.notificationCounter+1})
+        // Store in database
+        emit('newNotification', data)
+      }
+    }
+  }
+
+  getUser(userID) {
+    fetch(`/api/users/${userID}`)
+      .then(results => {
+        return results.json()
+      }).then(data => {
+        this.setState({notifications: data.notifications})
+        console.log("NOTIFICATIONS", data.notifications)
+        this.setState({notificationCounter: this.state.notifications.filter((notification) => !notification.read).length})
+    })
   }
 
   login() {
@@ -128,6 +183,35 @@ class PrimarySearchAppBar extends React.Component {
     this.setState({ mobileMoreAnchorEl: null });
   };
 
+  toggleNotifications() {
+    // If closing notifications and there exists new notification
+    if (this.state.showNotifications && this.state.notificationCounter > 0) {
+      // Set all as read
+      this.state.notifications.map((notification) => {
+        if (!notification.read) {
+          notification.read = !notification.read
+        }
+      })
+      // Update database
+      this.markRead()
+      this.setState({notificationCounter: 0})
+    }
+    this.setState({showNotifications: !this.state.showNotifications})
+  }
+
+  markRead() {
+    fetch(`/api/users/${this.state.profile.sub}/notifications`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      }
+    }).then(results => {
+        return results.json()
+      }).then(data => {
+          console.log("READ DATA", data)
+      });
+  }
   render() {
     const { anchorEl, mobileMoreAnchorEl } = this.state;
     const { classes } = this.props;
@@ -175,33 +259,37 @@ class PrimarySearchAppBar extends React.Component {
           </IconButton>
           <p>Main Page</p>
         </MenuItem></Link>
+        {isAuthenticated() &&
         <Link exact to="/addItem" style={{ textDecoration: 'none' }}><MenuItem>
           <IconButton>
             <AddBoxIcon />
           </IconButton>
           <p>Sell Item</p>
-        </MenuItem></Link>
+        </MenuItem></Link>}
+        {isAuthenticated() &&
         <Link exact to={`/cart`} style={{ textDecoration: 'none' }}><MenuItem>
           <IconButton>
             <ShoppingCartIcon />
           </IconButton>
           <p>Shopping Cart</p>
-        </MenuItem></Link>
+        </MenuItem></Link>}
+        {isAuthenticated() &&
         <MenuItem>
-          <IconButton>
-            <Badge badgeContent={11} color="secondary">
-              <NotificationsIcon />
-            </Badge>
+          <IconButton onClick={()=> this.toggleNotifications()}>
+            {this.state.notificationCounter > 0 ? <Badge badgeContent={this.state.notificationCounter} color="secondary">
+              <NotificationsIcon/>
+            </Badge>: <NotificationsIcon onClick={()=> this.toggleNotifications()}/>}
           </IconButton>
           <p>Notifications</p>
-        </MenuItem>
+        </MenuItem>}
+        {isAuthenticated() &&
         <Link exact to="/profile" style={{ textDecoration: 'none' }}>
         <MenuItem onClick={this.handleProfileMenuOpen}>
           <IconButton>
             <AccountCircle />
           </IconButton>
           <p>Profile</p>
-        </MenuItem></Link>
+        </MenuItem></Link>}
       </Menu>
     );
     return (
@@ -215,21 +303,24 @@ class PrimarySearchAppBar extends React.Component {
             </Link>
             <div className={classes.grow} />
             <div className={classes.sectionDesktop}>
+              {isAuthenticated() &&
               <Link exact to="/addItem" style={{ textDecoration: 'none' }}>
                 <IconButton>
                   <AddBoxIcon />
                 </IconButton>
-              </Link>
+              </Link>}
+              {isAuthenticated() &&
               <Link exact to={`/cart`} style={{ textDecoration: 'none' }}>
                 <IconButton>
                   <ShoppingCartIcon />
                 </IconButton>
-              </Link>
-              <IconButton>
-                <Badge badgeContent={0} color="secondary">
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
+              </Link>}
+              {isAuthenticated() &&
+              <IconButton onClick={()=> this.toggleNotifications()}>
+                {this.state.notificationCounter > 0 ? <Badge badgeContent={this.state.notificationCounter} color="secondary">
+              <NotificationsIcon/>
+            </Badge>: <NotificationsIcon onClick={()=> this.toggleNotifications()}/>}
+              </IconButton>}
               <IconButton
                 aria-owns={isMenuOpen ? 'material-appbar' : undefined}
                 aria-haspopup="true"
@@ -245,6 +336,7 @@ class PrimarySearchAppBar extends React.Component {
             </div>
           </Toolbar>
         </AppBar>
+        {this.state.showNotifications && this.state.notifications.length > 0 ? <Notifications notifications={this.state.notifications} /> : null}
         {!isAuthenticated() && renderMenuNotAuth}
         {isAuthenticated() && renderMenuIsAuth}
         {renderMobileMenu}

@@ -5,8 +5,9 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import moment from 'moment'
-
-import { withRouter, Redirect } from 'react-router';
+import socketIOClient from "socket.io-client"
+import { withRouter, Redirect } from 'react-router'
+import { connect, emit } from './Socket/socketConnect.js'
 
 // TODO: Set up Report Item functionality
 // TODO: Prevent adding to cart and watchlist multiple times
@@ -50,6 +51,9 @@ class ItemPage extends React.Component {
     this.handleEditSubmit = this.handleEditSubmit.bind(this)
     this.deleteItem = this.deleteItem.bind(this)
     this.toggleEdit = this.toggleEdit.bind(this)
+    this.socketBid = this.socketBid.bind(this)
+    this.socketUpdateBid = this.socketUpdateBid.bind(this)
+    this.removeFromWatchlist = this.removeFromWatchlist.bind(this)
   }
 
   componentWillMount() {
@@ -62,6 +66,23 @@ class ItemPage extends React.Component {
     } else {
       this.setState({ profile: userProfile })
     }
+
+    connect('bid',(message) => this.socketUpdateBid(message))
+  }
+
+  socketUpdateBid(data) {
+    this.state.bidHistory.push(JSON.parse(data))
+    this.setState({startPrice: JSON.parse(data).bidPrice})
+  }
+
+  socketBid() {
+    const data = JSON.stringify({
+        userID: this.state.profile.sub,
+        bidPrice: this.state.bidPrice,
+        bidTime: Date.now(),
+        itemID: this.state.itemID
+      })
+    emit('bid', data)
   }
 
   getItem() {
@@ -72,8 +93,9 @@ class ItemPage extends React.Component {
         return results.json()
       }).then(data => {
         this.setState({...data})
+        this.setState({bidHistory: data.bid_history})
         if (this.state.bidHistory.length > 0) {
-          this.setState({startingPrice: this.state.bidHistory[this.state.bidHistory.length-1]})
+          this.setState({startPrice: this.state.bidHistory[this.state.bidHistory.length-1].bidPrice})
         }
         if (moment(Date.now()).isAfter(moment(this.state.endTime))) {
           this.setState({expired: true})
@@ -110,22 +132,23 @@ class ItemPage extends React.Component {
 
   handleBid() {
     // TODO: Validate in backend as well
-    fetch(`/api/items/${this.state.itemID}/bid`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        userID: this.state.profile.sub,
-        bidPrice: this.state.bidPrice,
-        bidTime: Date.now()
-      })
-    }).then(results => {
-      return results.json()
-    }).then(data => {
-        this.setState({startPrice: data.bidPrice})
-    })
+    this.socketBid()
+    // fetch(`/api/items/${this.state.itemID}/bid`, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Accept': 'application/json',
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({
+    //     userID: this.state.profile.sub,
+    //     bidPrice: this.state.bidPrice,
+    //     bidTime: Date.now()
+    //   })
+    // }).then(results => {
+    //   return results.json()
+    // }).then(data => {
+    //     this.setState({startPrice: data.bidPrice})
+    // })
   }
 
   addToCart(price) {
@@ -166,6 +189,23 @@ class ItemPage extends React.Component {
         console.log(data)
     })
   }
+
+  removeFromWatchlist() {
+        const itemID = this.state.itemID;
+        const userID = this.state.profile.sub;
+        this.setState({itemID: itemID,
+                             userID: userID});
+        fetch(`/api/users/${userID}/watchlist/${itemID}`,
+            {method: "DELETE",})
+            .then(results => {
+                return results.json() // route definition says its the user object (server.py: 157)
+            }).then(data => {
+                this.setState({...data})
+                console.log(data)
+                location.reload()
+                // refresh page was intended to make watchlist have new state. but may not necessary here.
+        })
+    }
 
   reportItem() {
     console.log("REPORT")
@@ -233,7 +273,7 @@ class ItemPage extends React.Component {
         <p> Time Left: {this.state.expired ? "Auction has ended" : `${this.state.remainingTime}, ending at ${moment(this.state.endTime).format("LLLL")}`} </p>
         <p> Bid Price: ${this.state.startPrice} </p>
         <Button variant="contained" onClick={()=>this.toggleBid()} disabled={this.state.expired}> Bid </Button>
-        {this.state.bid && !this.state.expired && this.state.profile.hasOwnProperty('sub') ? <div><form autoComplete="off">
+        {this.state.bid && !this.state.expired && this.state.profile ? <div><form autoComplete="off">
         <TextField
             required
             label="Bid Amount"
@@ -254,7 +294,7 @@ class ItemPage extends React.Component {
         </form>
         <Button variant="contained" onClick={()=>this.handleBid()} disabled={!this.state.validBid}> Make Bid </Button>
         </div>: null}
-        {this.state.buyPrice !== "0.00" ? <div><p>Buy Price: ${this.state.buyPrice}</p><Button variant="contained" onClick={()=>this.addToCart(parseFloat(this.state.buyPrice) + parseFloat(this.state.shippingPrice))} disabled={!this.state.profile.hasOwnProperty('sub')}> Buy Now </Button></div> : ""}
+        {this.state.buyPrice !== "0.00" ? <div><p>Buy Price: ${this.state.buyPrice}</p><Button variant="contained" onClick={()=>this.addToCart(parseFloat(this.state.buyPrice) + parseFloat(this.state.shippingPrice))} disabled={!this.state.profile}> Buy Now </Button></div> : ""}
         <p> Shipping price: ${this.state.shippingPrice} </p>
         <h4>Description</h4>
         {this.state.description}
@@ -262,6 +302,8 @@ class ItemPage extends React.Component {
         {this.state.categories}
         <br />
         <Button variant="contained" onClick={()=>this.addToWatchlist()}>Add to Watchlist </Button>
+        {/*remove from watchlist*/}
+        <Button variant="contained" onClick={()=>this.removeFromWatchlist()}>Remove from Watchlist</Button>
         <Button variant="contained" onClick={()=>this.reportItem()}>Report Item </Button>
 
         <p>
