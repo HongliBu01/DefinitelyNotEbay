@@ -38,6 +38,7 @@ class WatchListPage extends React.Component {
       .then(results => {
         return results.json()
       }).then(data => {
+        console.log("WATCH", data)
         this.setState({watchlist: data})
     })
   }
@@ -48,7 +49,7 @@ class WatchListPage extends React.Component {
           <Typography component="h2" variant="h1" gutterBottom>
               This is your Watchlist:
           </Typography>
-          {this.state.watchlist.map((item, i) => <CardItem itemID={item._id}/>)}
+          {this.state.watchlist.map((item, i) => <CardItem showBought={true} itemID={item._id}/>)}
 
       </div>
     )

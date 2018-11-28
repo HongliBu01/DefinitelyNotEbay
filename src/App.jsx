@@ -11,6 +11,7 @@ import Auth from "./Auth/Auth";
 import Callback from './Callback/Callback';
 import WatchListPage from './WatchListPage.jsx'
 import ShoppingCartPage from './ShoppingCartPage.jsx'
+import AdminMainPage from './AdminMain.jsx'
 
 class App extends React.Component {
   render() {
@@ -26,15 +27,18 @@ class App extends React.Component {
       <div>
         <PrimarySearchAppBar auth={auth}/>
         <Switch>
-          <Route exact path="/" render={(props) => <MainPage auth={auth} />} />
-          <Route path="/addItem" render={(props) => <AddItem auth={auth} />} />
-          <Route path="/profile" render={(props) => <Profile auth={auth} />} />
+          <Route exact path="/" render={(props) => <MainPage auth={auth} {...props}/>} />
+          <Route path="/addItem" render={(props) => <AddItem auth={auth} {...props}/>} />
+          <Route path="/profile" render={(props) => <Profile auth={auth} {...props}/>} />
           <Route path="/item/:id" render={(props) => <ItemPage auth={auth} {...props}/>} />
           <Route exact path="/watchlist" render={(props) => <WatchListPage auth={auth} {...props}/>} />
           <Route exact path="/account" render={(props) => <EditUser auth={auth} {...props}/>} />
           <Route exact path="/cart" render={(props) => <ShoppingCartPage auth={auth} {...props}/>} />
           <Route exact path="/checkout" render={(props) => <ShoppingCartPage auth={auth} {...props}/>} />
           <Route exact path="/admin/users" render={(props) => <UserPage auth={auth} {...props}/>} />
+          <Route exact path="/admin/listings" render={(props) => <AdminMainPage auth={auth} {...props}/>} />
+          <Route exact path="/admin/flags" render={(props) => <AdminMainPage auth={auth} {...props}/>} />
+          <Route exact path="/admin/customersupport" render={(props) => <AdminMainPage auth={auth} {...props}/>} />
           {/*
           <Route exact path="users/:user_id/buy_history" component={BuyHistoryPage}
           <Route exact path="users/:user_id/bid_history" component={BidHistoryPage}

@@ -248,10 +248,10 @@ class PrimarySearchAppBar extends React.Component {
         open={isMenuOpen}
         onClose={this.handleAdminMenuClose}
       >
-        <MenuItem onClick={this.handleMenuClose}><Link exact to="/profile" style={{ textDecoration: 'none' }}>Manage Users</Link></MenuItem>
-        <MenuItem onClick={this.handleMenuClose}><Link exact to="/account" style={{ textDecoration: 'none' }}>View All Listings</Link></MenuItem>
-        <MenuItem onClick={this.handleMenuClose}><Link exact to="/watchlist" style={{ textDecoration: 'none' }}>Manage Flags</Link></MenuItem>
-        <MenuItem onClick={this.handleMenuClose}><Link exact to="/watchlist" style={{ textDecoration: 'none' }}>Customer Service</Link></MenuItem>
+        <MenuItem onClick={this.handleMenuClose}><Link exact to="/admin/users" style={{ textDecoration: 'none' }}>Manage Users</Link></MenuItem>
+        <MenuItem onClick={this.handleMenuClose}><Link exact to="/admin/listings" style={{ textDecoration: 'none' }}>View All Listings</Link></MenuItem>
+        <MenuItem onClick={this.handleMenuClose}><Link exact to="/admin/flags" style={{ textDecoration: 'none' }}>Manage Flags</Link></MenuItem>
+        <MenuItem onClick={this.handleMenuClose}><Link exact to="/admin/customersupport" style={{ textDecoration: 'none' }}>Customer Service</Link></MenuItem>
       </Menu>
     );
 
@@ -386,7 +386,7 @@ class PrimarySearchAppBar extends React.Component {
           </Toolbar>
         </AppBar>
         {this.state.showNotifications && this.state.notifications.length > 0 ? <Notifications notifications={this.state.notifications} /> : null}
-        {!isAuthenticated() && this.state.adminMenuOpen && renderMenuNotAuth}
+        {!isAuthenticated() && !this.state.adminMenuOpen && renderMenuNotAuth}
         {isAuthenticated() && !this.state.adminMenuOpen && renderMenuIsAuth}
         {isAuthenticated() && this.state.isAdmin && this.state.adminMenuOpen && renderMenuIsAdmin}
         {renderMobileMenu}

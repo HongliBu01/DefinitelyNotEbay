@@ -35,7 +35,9 @@ class MainPage extends React.Component {
       categories: [],
       selectedCategories: [],
       search: "",
-      profile: {}
+      profile: {},
+      activeType: 'all',
+      sortType: 'recentSort'
     };
 
     this.getItems = this.getItems.bind(this)
@@ -43,6 +45,9 @@ class MainPage extends React.Component {
     this.filterCategory = this.filterCategory.bind(this)
     this.handleChange = this.handleChange.bind(this)
     this.searchItems = this.searchItems.bind(this)
+    this.getUser = this.getUser.bind(this)
+    this.filterActive = this.filterActive.bind(this)
+    this.endSort = this.endSort.bind(this)
   }
 
   componentWillMount() {
@@ -53,10 +58,22 @@ class MainPage extends React.Component {
     if (!userProfile) {
       getProfile((err, profile) => {
         this.setState({profile})
+        this.getUser(profile.sub)
       })
     } else {
       this.setState({ profile: userProfile })
+      this.getUser(userProfile.sub)
     }
+  }
+
+  getUser(userID) {
+    fetch(`/api/users/${userID}`)
+      .then(results => {
+        return results.json()
+      }).then(data => {
+        console.log(data)
+        this.setState({...data})
+    })
   }
 
   getItems() {
@@ -65,14 +82,9 @@ class MainPage extends React.Component {
         return results.json()
       }).then(data => {
           console.log(data)
-          var allItems = []
-          // Hide expired items
-          data.map((item) => {
-            if (moment(Date.now()).isBefore(moment(item.endTime))) {
-              allItems.push(item)
-            }
-          })
-          this.setState({allItems: allItems})
+          data.sort(function(a, b){return moment(a.endTime).isBefore(moment(b.endTime)) ? -1 : 1})
+          console.log("Sorted", data)
+          this.setState({allItems: data})
       });
   }
 
@@ -85,26 +97,39 @@ class MainPage extends React.Component {
     })
   }
 
-  getCart() {
-    // fetch('/api/users/5bdd060508ffae36201e3a79/cart') // TODO: URL Parsing, get correct userID
-      fetch('/api/users/google-oauth2|101445531905307187466/cart') //changed to use another id
-      .then(results => {
-        return results.json()
-      }).then(data => {
-        console.log(data)
-        this.setState({cartItems: data})
+
+  filterActive(activeType) {
+    // Filter by active
+    var currentItems = []
+    if (activeType === "active_only") {
+      this.state.allItems.map((item) => {
+        if (moment(Date.now()).isBefore(moment(item.endTime))) {
+          currentItems.push(item)
+        }
       })
+    } else if (activeType === "all") {
+      // Do nothing
+    } else if (activeType === "inactive_only") {
+      // Inactive only
+      this.state.allItems.map((item) => {
+        if (moment(Date.now()).isAfter(moment(item.endTime))) {
+          currentItems.push(item)
+        }
+      })
+    } else {
+      // Sold only
+      this.state.allItems.map((item) => {
+        if (item.soldFlag) {
+          currentItems.push(item)
+        }
+      })
+    }
+    this.setState({currentItems})
+
   }
 
-  getWatchlist() {
-    fetch('/api/users/google-oauth2|101445531905307187466/watchlist') // TODO: URL Parsing
-    // changed to use another id, also from "cart" to "watchlist
-      .then(results => {
-        return results.json()
-      }).then(data => {
-        console.log(data)
-        this.setState({watchlistItems: data})
-      })
+  endSort(sortType) {
+    //Sort by recent ending
   }
 
   handleChange = name => event => {
@@ -117,11 +142,17 @@ class MainPage extends React.Component {
     if (name === "search") {
       this.searchItems(event.target.value)
     }
+    if (name === "selectActive") {
+      this.filterActive(event.target.value)
+    }
+    if (name === "listingSort") {
+      this.endSort(event.target.value)
+    }
   }
 
   searchItems(searchTerm) {
     var currentItems = []
-    if (this.state.selectedCategories.length > 0) {
+    if (this.state.selectedCategories.length > 0 || this.state.selectActive !== "all") {
       this.state.currentItems.forEach((item) => {
         if (item.name.toLowerCase().startsWith(searchTerm.toLowerCase())) {
           currentItems.push(item)
@@ -139,17 +170,27 @@ class MainPage extends React.Component {
 
   filterCategory(selectedCategories) {
     var currentItems = []
-    this.state.allItems.forEach((item) => {
+    if (this.state.selectActive !== "all") {
+      this.state.allItems.forEach((item) => {
       if (selectedCategories.filter(value => -1 !== item.categories.indexOf(value)).length > 0) {
         currentItems.push(item)
       }
-    })
+      })
+    } else {
+      this.state.currentItems.forEach((item) => {
+      if (selectedCategories.filter(value => -1 !== item.categories.indexOf(value)).length > 0) {
+        currentItems.push(item)
+      }
+      })
+    }
+
     this.setState({currentItems})
   }
   render() {
     // const {profile} = this.state
     return (
       <div>
+      {this.state.isAdmin ? <div>
       <InputLabel htmlFor="select-multiple-chip">Categories </InputLabel>
       <Select
         multiple
@@ -170,6 +211,23 @@ class MainPage extends React.Component {
           </MenuItem>
         ))}
       </Select>
+      <InputLabel htmlFor="select-multiple-chip">Active Items</InputLabel>
+      <Select
+        value={this.state.activeType}
+        onChange={this.handleChange("selectActive")}
+      >
+      <MenuItem key={'all'} value={'all'}> All Items </MenuItem>
+      <MenuItem key={'active_only'} value={'active_only'}> Only Active </MenuItem>
+      <MenuItem key={'inactive_only'} value={'inactive_only'}> Only Expired </MenuItem>
+      <MenuItem key={'sold_only'} value={'sold_only'}> Only Sold </MenuItem>
+      </Select>
+      <Select
+        value={this.state.sortType}
+        onChange={this.handleChange("listingSort")}
+      >
+      <MenuItem key={'recentSort'} value={'recentSort'}> Most Recent </MenuItem>
+      <MenuItem key={'oldestSort'} value={'oldestSort'}> Oldest </MenuItem>
+      </Select>
       <TextField
           id="standard-search"
           label="Search"
@@ -180,7 +238,7 @@ class MainPage extends React.Component {
       <div style={{margin: '10px'}}>
       {this.state.currentItems.length > 0 || this.state.selectedCategories.length > 0 ? this.state.currentItems.map((item, i) => <CardItem key={item._id.$oid} itemID={item._id.$oid ? item._id.$oid : item._id} />) : this.state.allItems.map((item, i) => <CardItem key={item._id.$oid} itemID={item._id.$oid ? item._id.$oid : item._id} />)}
       </div>
-      </div>
+      </div> : <p> You are not authorized to view this page </p>} </div>
     )
   }
 }
