@@ -147,6 +147,33 @@ def cart(user_id):
         res = mongo.db.users.find_one_and_update({"_id": user_id}, {"$set": {"cart": user["cart"]}})
         return json.dumps(res, default=json_util.default)
 
+@app.route('/api/users/<user_id>/checkout', methods=['POST'])
+def checkout(user_id):
+    user = mongo.db.users.find_one({"_id": user_id})
+    # Store cart in buyHistory
+    cart = user["cart"]
+    timestamp = time.time() * 1000
+    new_buy = {"timestamp" : timestamp, "items" : cart}
+    if "buyHistory" not in user:
+        user["buyHistory"] = [new_buy]
+    else:
+        user["buyHistory"].append(new_buy)
+
+    mongo.db.users.find_one_and_update({"_id" : user_id}, {"$set" : user})
+
+    #flag items
+    for i in cart:
+        item = mongo.db.items.find_one({"_id" : ObjectId(i["_id"])})
+        item["soldFlag"] = True
+        mongo.db.items.find_one_and_update({"_id" : ObjectId(i["_id"])}, {"$set" : item})
+        # Go through all users, check if item is in their cart, if so, remove
+        mongo.db.users.update({},{ "$pull": { "cart": { "_id" : i["_id"] } } }, multi= True)
+
+    # Clear cart
+    user["cart"] = []
+    res = mongo.db.users.find_one_and_update({"_id": user_id}, {"$set" : user})
+    return json.dumps(res, default=json_util.default)
+
 
 # WATCHLIST
 @app.route('/api/users/<user_id>/watchlist', methods=['GET', 'POST'])
