@@ -11,6 +11,8 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 
+var moment = require('moment')
+
 const styles = theme => ({
   container: {
     display: 'flex',
@@ -46,14 +48,22 @@ class AddItem extends React.Component {
       startPrice: "0.00",
       buyPrice: "0.00",
       shippingPrice: "0.00",
-      startTime: "",
+      startTime: moment().format('YYYY-MM-DDTHH:mm'),
       endTime: "",
       category: "",
       redirect: false,
       selectedCategories: [],
       availableCategories: [],
       invalidCategory: false,
-      profile: {}
+      profile: {},
+      invalidName: true,
+      invalidQuantity: false,
+      invalidStartPrice: false,
+      invalidBuyPrice: false,
+      invalidShippingPrice: false,
+      invalidStartTime: false,
+      invalidEndTime: true,
+      isActive: true
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -82,10 +92,91 @@ class AddItem extends React.Component {
     })
   }
 
+
+  /* Validations
+  - Must provide a name
+  - Must provide a quantity (validate that it's an int > 0)
+  - Validate starting bid price (float >= 0), default = 0
+  - Buy now (float >= 0), default = 0
+  - Shipping price (float >= 0), default = 0
+  - Start time must be after now, if not set, default to current time
+  - End time must be after start time
+  */
   handleChange = name => event => {
     this.setState({
       [name]: event.target.value,
     });
+
+    // name must be provided
+    if (name === "name") {
+      if (event.target.value === "") {
+        this.setState({invalidName: true})
+      } else {
+        this.setState({invalidName: false})
+      }
+    }
+
+    // quantity must be an int > 0
+    if (name === "quantity") {
+      if (isNaN(event.target.value) || event.target.value != parseInt(Number(event.target.value)) || event.target.value <= 0) {
+        this.setState({invalidQuantity: true})
+      } else {
+        this.setState({invalidQuantity: false})
+      }
+    }
+
+    // startPrice must be a float >= 0
+    if (name === "startPrice") {
+      if (isNaN(event.target.value) || event.target.value < 0) {
+        this.setState({invalidStartPrice: true})
+      } else {
+        this.setState({invalidStartPrice: false})
+      }
+    }
+
+    // buyPrice must be a float >= 0
+    if (name === "buyPrice") {
+      if (isNaN(event.target.value) || event.target.value < 0) {
+        this.setState({invalidBuyPrice: true})
+      } else {
+        this.setState({invalidBuyPrice: false})
+      }
+    }
+
+    // shippingPrice must be a float >= 0
+    if (name === "shippingPrice") {
+      if (isNaN(event.target.value) || event.target.value < 0) {
+        this.setState({invalidShippingPrice: true})
+      } else {
+        this.setState({invalidShippingPrice: false})
+      }
+    }
+
+    // startTime must be on or after current time
+    if (name === "startTime") {
+      if (moment(event.target.value).isBefore()) {
+        this.setState({invalidStartTime: true})
+      } else {
+        this.setState({invalidStartTime: false})
+      }
+
+      if (moment(event.target.value).isAfter()) {
+        this.setState({isActive: false})
+      } else {
+        this.setState({isActive: true})
+      }
+    }
+
+    // endTime must be after startTime
+    if (name === "endTime") {
+      if (moment(event.target.value).isSameOrBefore(moment(this.state.startTime))) {
+        this.setState({invalidEndTime: true})
+      } else {
+        this.setState({invalidEndTime: false})
+      }
+    }
+
+    // category duplicates not allowed
     if (name === "category") {
       if (this.state.availableCategories.indexOf(event.target.value) !== -1) {
         this.setState({invalidCategory: false})
@@ -93,6 +184,9 @@ class AddItem extends React.Component {
         this.setState({invalidCategory: true})
       }
     }
+
+
+
   };
 
   handleSubmit() {
@@ -154,6 +248,7 @@ class AddItem extends React.Component {
     if (this.state.redirect) {
       return <Redirect push to={`/item/${this.state._id}`} />;
     }
+    console.log(this.state.invalidName)
     return(
       <div style={{ margin: '10px'}}>
         <h1>Add an Item</h1>
@@ -293,7 +388,16 @@ class AddItem extends React.Component {
             margin="dense"
           />
       </form>
-      <Button onClick={()=>this.handleSubmit()}> Submit </Button>
+      <Button disabled={this.state.invalidName || this.state.invalidQuantity || this.state.invalidStartPrice || 
+        this.state.BuyPrice || this.state.invalidShippingPrice || this.state.invalidStartTime} onClick={()=>this.handleSubmit()}> Submit </Button>
+      {this.state.invalidName ? <div><font color="red">Item name cannot be empty</font></div> : null}
+      {this.state.invalidQuantity ? <div><font color="red">Quantity must be an integer value greater than 0</font></div> : null}
+      {this.state.invalidStartPrice ? <div><font color="red">Start Price must be a numeric value greater than or equal to 0</font></div> : null}
+      {this.state.invalidBuyPrice ? <div><font color="red">Buy Price is optional, but if set, it must be a numeric value greater than 0</font></div> : null}
+      {this.state.invalidShippingPrice ? <div><font color="red">Shipping Price must be a numeric value greater than or equal to 0</font></div> : null}
+      {this.state.invalidStartTime ? <div><font color="red">Start Time must be now, or some time after now</font></div> : null}
+      {this.state.invalidEndTime ? <div><font color="red">End Time must be set to some time after Start Time</font></div> : null}
+      {console.log("Is active:", this.state.isActive)}
       </div>
     )
   }
