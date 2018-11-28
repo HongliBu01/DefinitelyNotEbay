@@ -86,9 +86,12 @@ class CardItem extends React.Component {
                     <Typography color="textSecondary">
                         Quantity: {this.state.quantity || "Not Specified"}
                     </Typography>
+                    {this.props.showBought && this.state.soldFlag ? <Typography color="textSecondary">
+                        SOLD
+                    </Typography> :
                     <Typography color="textSecondary">
                         Time Remaining: {this.state.remainingTime}
-                    </Typography>
+                    </Typography>}
                     <Typography color="textSecondary">
                         Bid Price: ${this.state.startPrice || "Not Specified"}
                     </Typography>

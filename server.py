@@ -86,6 +86,9 @@ def findAllItems():
     items = []
     # TODO: Check if time period has ended. If true, move item to last bidder's cart with type "bid" and mark not active
     for item in mongo.db.items.find():
+        # If item endTime has past
+        # Check if item is sold
+        # Check length of bid_history. If it's greater than 0, then move it to winner's cart and mark as sold
         items.append(item)
     return json.dumps(items, default=json_util.default)
 
@@ -100,6 +103,9 @@ def createItem():
 def handleItem(item_id):
     if request.method == 'GET':
         itemData = mongo.db.items.find_one_or_404({"_id": ObjectId(item_id)})
+        # If item endTime has past
+        # Check if item is sold
+        # Check length of bid_history. If it's greater than 0, then move it to winner's cart and mark as sold
         return json.dumps(itemData, default=json_util.default)
 
     if request.method == 'PUT':
