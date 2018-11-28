@@ -98,7 +98,8 @@ def handleItem(item_id):
 
     if request.method == 'DELETE':
         res = mongo.db.items.delete_one({"_id": ObjectId(item_id)})
-        return json.dumps(res, default=json_util.default)
+        # return json.dumps(res, default=json_util.default)
+        print(res)
 
 
 # BID STUFF

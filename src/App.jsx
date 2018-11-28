@@ -5,7 +5,6 @@ import AddItem from './AddItem.jsx'
 import MainPage from './MainPage.jsx'
 import Profile from './Profile.jsx'
 import ItemPage from './ItemPage.jsx'
-import EditItem from './EditItem.jsx'
 import UserPage from './UserPage.jsx'
 import EditUser from './EditUser.jsx'
 import Auth from "./Auth/Auth";
@@ -30,7 +29,6 @@ class App extends React.Component {
           <Route exact path="/" render={(props) => <MainPage auth={auth} />} />
           <Route path="/addItem" render={(props) => <AddItem auth={auth} />} />
           <Route path="/profile" render={(props) => <Profile auth={auth} />} />
-          <Route path="/item/:id/edit" render={(props) => <EditItem auth={auth} {...props}/>} />
           <Route path="/item/:id" render={(props) => <ItemPage auth={auth} {...props}/>} />
           <Route exact path="/watchlist" render={(props) => <WatchListPage auth={auth} {...props}/>} />
           <Route exact path="/account" render={(props) => <EditUser auth={auth} {...props}/>} />

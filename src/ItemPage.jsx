@@ -34,16 +34,22 @@ class ItemPage extends React.Component {
       expired: false,
       remainingTime: "",
       profile: {},
-      redirect: false
+      redirectToCart: false,
+      redirectToMain: false,
+      canEdit: false,
+      isActive: false
     }
     this.getItem = this.getItem.bind(this)
     this.handleChange = this.handleChange.bind(this)
+    this.handleBidChange = this.handleBidChange.bind(this)
     this.toggleBid = this.toggleBid.bind(this)
     this.handleBid = this.handleBid.bind(this)
-    this.handleBidChange = this.handleBidChange.bind(this)
     this.addToCart = this.addToCart.bind(this)
     this.addToWatchlist = this.addToWatchlist.bind(this)
     this.reportItem = this.reportItem.bind(this)
+    this.handleEditSubmit = this.handleEditSubmit.bind(this)
+    this.deleteItem = this.deleteItem.bind(this)
+    this.toggleEdit = this.toggleEdit.bind(this)
   }
 
   componentWillMount() {
@@ -74,6 +80,11 @@ class ItemPage extends React.Component {
         } else {
           const duration = moment.duration(moment(this.state.endTime).diff(moment(Date.now())))
           this.setState({remainingTime: duration.humanize()})
+        }
+        if (moment(Date.now()).isAfter(moment(this.state.startTime)) && moment(Date.now()).isBefore(moment(this.state.endTime))) {
+          this.setState({isActive: true})
+        } else {
+          this.setState({isActive: false})
         }
     })
   }
@@ -134,7 +145,7 @@ class ItemPage extends React.Component {
       return results.json()
     }).then(data => {
         console.log(data)
-        this.setState({redirect: true})
+        this.setState({redirectToCart: true})
     })
   }
 
@@ -160,16 +171,66 @@ class ItemPage extends React.Component {
     console.log("REPORT")
   }
 
+  handleEditSubmit() {
+    const itemID = this.state.itemID
+    fetch(`/api/items/${itemID}`, {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: this.state.name,
+        description: this.state.description
+      })
+    }).then(results => {
+        return results.json()
+      }).then(data => {
+          if (data._id) {
+            this.setState({redirect: false})
+          }
+      });
+  }
+
+  deleteItem() {
+    const itemID = this.state.itemID
+    console.log('REMOVE ITEM', itemID)
+    fetch(`/api/items/${itemID}`, {
+      method: 'DELETE',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+      })
+    });
+    this.setState({redirectToMain: true})
+  }
+
+  toggleEdit() {
+    console.log(this.state.toggleEdit)
+    this.setState({canEdit: !this.state.canEdit})
+  }
+
   render() {
-    if (this.state.redirect) {
+    if (this.state.redirectToCart) {
       return <Redirect push to={`/cart`} />;
     }
+    if (this.state.redirectToMain) {
+      return <Redirect push to={`/`} />;
+    }
+    console.log(this.state.itemID)
+    console.log("is active:", this.state.isActive)
     return (
+
       <div>
+      {this.state.name == "" ? <div><h1> Oops! The item doesn't exist :(</h1><img src="https://pixel.nymag.com/imgs/daily/intelligencer/2014/12/08/08-grumpy-cat.w330.h330.jpg"/></div> :
+        <div>
         <h1>{this.state.name}</h1>
 
         <p> Quantity: {this.state.quantity}</p>
-        <p> Time Left: {this.state.expired ? "Auction has ended" : this.state.remainingTime} </p>
+        {!this.state.isActive && !this.state.expired ? <p> Auction Starts: {moment(this.state.startTime).format("LLLL")} </p> : null }
+        <p> Time Left: {this.state.expired ? "Auction has ended" : `${this.state.remainingTime}, ending at ${moment(this.state.endTime).format("LLLL")}`} </p>
         <p> Bid Price: ${this.state.startPrice} </p>
         <Button variant="contained" onClick={()=>this.toggleBid()} disabled={this.state.expired}> Bid </Button>
         {this.state.bid && !this.state.expired && this.state.profile.hasOwnProperty('sub') ? <div><form autoComplete="off">
@@ -203,14 +264,54 @@ class ItemPage extends React.Component {
         <Button variant="contained" onClick={()=>this.addToWatchlist()}>Add to Watchlist </Button>
         <Button variant="contained" onClick={()=>this.reportItem()}>Report Item </Button>
 
-         {this.state.seller != this.state.profile.sub ? null :
-            <p><h2> Edit Item </h2>
-            <Link to={`/item/${this.state.itemID}/edit`} style={{ textDecoration: 'none' }}><Button variant="contained"> Edit Item </Button></Link>
+        <p>
+        {this.state.profile && this.state.seller === this.state.profile.sub && <Button variant="contained" onClick={()=>this.toggleEdit()}> Edit Listing </Button>}
+         {this.state.canEdit &&
+            <p>
+            <div style={{ margin: '10px'}}>
+              <h1>Edit Item</h1>
+              <h2> Change Item Name </h2>
+              <form noValidate autoComplete="off">
+                <TextField
+                  required
+                  label="Name"
+                  id="name"
+                  defaultValue={this.state.name}
+                  value={this.state.name}
+                  onChange={this.handleChange('name')}
+                />
+                <br />
+              </form>
+
+              <h2> Change Item Description </h2>
+              <form noValidate autoComplete="off">
+                <TextField
+                  required
+                  label="Description"
+                  id="description"
+                  defaultValue={this.state.description}
+                  value={this.state.description}
+                  onChange={this.handleChange('description')}
+                />
+                <br />
+            </form>
+            <Button variant="contained" onClick={()=>this.handleEditSubmit()}> Submit </Button>
+            </div>
+
+            {this.state.profile && this.state.bid_history ? null :
+              <div>
+              <h1> Delete Item </h1>
+              <Button variant="contained" onClick={()=>this.deleteItem()}> Delete </Button>
+              </div>
+            }
             </p>
         }
-
+      </p>
+      </div>
+    }
       </div>
     )
   }
 }
+
 export default ItemPage
