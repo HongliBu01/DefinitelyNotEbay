@@ -1,1 +1,2 @@
-const ics = require('ics');
+import createEvent from 'ics';
+
