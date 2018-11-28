@@ -278,7 +278,10 @@ def handle_notification(notification):
     user = mongo.db.users.find_one({"_id": user_id})
     user["notifications"].append(new_notification)
     mongo.db.users.find_one_and_update({"_id": user_id}, {"$set": user})
+<<<<<<< HEAD
 >>>>>>> master
+=======
+>>>>>>> 9b4d7c6582610cf32340691b91d8b936d0c78943
 
 @app.route('/<path:path>')
 def catch_all(path):

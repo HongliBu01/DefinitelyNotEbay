@@ -10,17 +10,30 @@ class WatchListPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+        profile: {},
         watchlist:[]
     };
     this.getWatchList = this.getWatchList.bind(this)
   }
 
   componentWillMount() {
-    this.getWatchList();
+      // TODO: getItems() here?
+     const { userProfile, getProfile } = this.props.auth;
+     if (!userProfile) {
+      getProfile((err, profile) => {
+        this.setState({profile});
+        this.getWatchList()
+      })
+     } else {
+       this.setState({ profile: userProfile });
+       this.getWatchList()
+     }
+     // this.getWatchList() why here is not OK? -- gets "undefined"
   }
 
   getWatchList() {
-    const userID = this.props.match.params.user_id;
+    const userID = this.state.profile.sub;
+      console.log(userID);
     fetch(`/api/users/${userID}/watchlist`)
       .then(results => {
         return results.json()
