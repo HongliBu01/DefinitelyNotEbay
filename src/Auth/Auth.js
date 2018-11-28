@@ -43,7 +43,9 @@ export default class Auth {
   getAccessToken() {
     const accessToken = localStorage.getItem('access_token')
     if (!accessToken) {
-      console.log('No Access Token found')
+      // throw new Error('No Access Token found')
+        // This is to avoid error in testing.
+        console.log('No Access Token found')
     }
     return accessToken
   }
@@ -74,7 +76,8 @@ export default class Auth {
                 isAdmin: false,
                 bidHistory: [],
                 buyHistory: [],
-                listings: []
+                listings: [],
+                notifications: []
               }
               // Add user to database
               fetch('/api/users', {

@@ -116,7 +116,8 @@ class AddItem extends React.Component {
         reportFlag: false,
         categories: this.state.selectedCategories,
         soldFlag: false,
-        activeFlag: this.state.active
+        activeFlag: this.state.active,
+        bid_history: []
       })
     }).then(results => {
         return results.json()

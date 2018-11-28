@@ -85,11 +85,41 @@ class EditUser extends React.Component {
   }
 
   suspendAccount() {
-    console.log('TOGGLE ISACTIVE FLAG')
+    const userID = this.state._id;
+    fetch(`/api/users/${userID}`, {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            isActive: !this.state.isActive
+        })
+    }).then(results =>{
+      return results.json()
+    }).then( data => {
+      // console.log(data)
+        if (data._id) {
+          this.setState({redirect: true})
+        }
+    })
   }
 
   deleteAccount() {
-    console.log('REMOVE ACCOUNT')
+    const userID = this.state._id;
+    if (userID !== this.state.profile.sub) {
+          console.log("deleting " + userID);
+          // TODO: Pop a confirmation?
+          fetch(`/api/users/${userID}`,
+              {method: "DELETE"})
+              .then(result => {
+                  console.log("deleted" + result.json()["_id"]);
+                  return result.json()
+              })
+      } else {
+        console.log("don't delete yourself.");
+        alert("Do not delete yourself.") // TODO: find a way to properly delete yourself.
+      }
   }
 
   render() {

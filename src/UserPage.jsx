@@ -22,6 +22,9 @@ class UserPage extends React.Component {
     }
     this.getUser = this.getUser.bind(this)
     this.getUsers = this.getUsers.bind(this)
+    this.suspendUser = this.suspendUser.bind(this)
+    this.deleteUser = this.deleteUser.bind(this)
+      this.makeAdmin = this.makeAdmin.bind(this)
   }
 
   componentWillMount() {
@@ -62,6 +65,74 @@ class UserPage extends React.Component {
       })
   }
 
+  suspendUser(user) {
+    console.log("Suspend:" + user._id);
+    console.log("Suspend:" + user.isActive);
+    fetch(`/api/users/${user._id}`, {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            isActive: !user.isActive
+        })
+    }).then(results =>{
+      return results.json()
+    }).then( data => {
+      // console.log(data)
+        if (data._id) {
+          location.reload();
+            // this.setState({redirect: true})
+        }
+    })
+  }
+
+  deleteUser(userID) {
+      console.log("Delete:" + userID);
+      console.log(this.state.profile.sub)
+      if (userID !== this.state.profile.sub) {
+          console.log("deleting " + userID)
+          // TODO: Pop a confirmation?
+          fetch(`/api/users/${userID}`,
+              {method: "DELETE"})
+              .then(result => {
+                  console.log("deleted" + result.json()["_id"]);
+                  return result.json()
+              })
+      } else {
+        console.log("don't delete yourself.");
+        alert("Do not cancel your own admin status.")
+      }
+
+  }
+
+  makeAdmin(user) { // TODO: Merge this with suspend to flipFlag()
+    console.log("make admin::" + user._id);
+    if (user._id !== this.state.profile.sub) {
+        fetch(`/api/users/${user._id}`, {
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                isAdmin: !user.isAdmin
+            })
+        }).then(results => {
+            return results.json()
+        }).then(data => {
+            // console.log(data)
+            if (data._id) {
+                location.reload();
+                // this.setState({redirect: true})
+            }
+        })
+    } else {
+      console.log("Do not cancel your own admin status.");
+      alert("Do not cancel your own admin status.")
+    }
+  }
 
   render() {
     return (
@@ -74,9 +145,9 @@ class UserPage extends React.Component {
           <li> Email: {user.email} </li>
           <li> Active: {String(user.isActive)} </li>
           <li> Admin: {String(user.isAdmin)} </li>
-          <Button> Suspend User </Button>
-          <Button> Delete User </Button>
-          <Button> Make Admin </Button>
+          <Button onClick={() => this.suspendUser(user)}> {user.isActive? 'Suspend':'Activate'} User </Button>
+          <Button onClick={() => this.deleteUser(user._id)}> Delete User </Button>
+          <Button onClick={() => this.makeAdmin(user)}> {user.isAdmin? 'Un-Make': 'Make'} Admin </Button>
           </ul>
           </div>)}
         </div>
