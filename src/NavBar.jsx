@@ -16,6 +16,7 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import MailIcon from '@material-ui/icons/Mail';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
+import SettingsIcon from '@material-ui/icons/Settings';
 import HomeIcon from '@material-ui/icons/Home';
 import AddBoxIcon from '@material-ui/icons/AddBox';
 import MoreIcon from '@material-ui/icons/MoreVert';
@@ -104,12 +105,15 @@ class PrimarySearchAppBar extends React.Component {
       notifications: [],
       profile: "",
       showNotifications: false,
-      notificationCounter: 0
+      notificationCounter: 0,
+      isAdmin: false,
+      adminMenuOpen: false
     };
     this.toggleNotifications = this.toggleNotifications.bind(this)
     this.getUser = this.getUser.bind(this)
     this.handleNewNotification = this.handleNewNotification.bind(this)
     this.markRead = this.markRead.bind(this)
+    this.toggleAdminMenu = this.toggleAdminMenu.bind(this)
   }
 
   componentWillMount() {
@@ -133,6 +137,10 @@ class PrimarySearchAppBar extends React.Component {
     connect('alert',(message) => this.handleNewNotification(message))
   }
 
+  toggleAdminMenu() {
+    this.setState({isAdmin: !this.state.isAdmin})
+  }
+
   handleNewNotification(data) {
     const message = JSON.parse(data)
     // Check if user is logged in
@@ -152,6 +160,8 @@ class PrimarySearchAppBar extends React.Component {
       .then(results => {
         return results.json()
       }).then(data => {
+        this.setState({isAdmin: data.isAdmin})
+        console.log("ADMIN", this.state.isAdmin)
         this.setState({notifications: data.notifications})
         console.log("NOTIFICATIONS", data.notifications)
         this.setState({notificationCounter: this.state.notifications.filter((notification) => !notification.read).length})
@@ -168,6 +178,17 @@ class PrimarySearchAppBar extends React.Component {
 
   handleProfileMenuOpen = event => {
     this.setState({ anchorEl: event.currentTarget });
+  };
+
+  handleAdminMenuOpen = event => {
+    this.setState({adminMenuOpen: true})
+    this.setState({ anchorEl: event.currentTarget });
+  };
+
+  handleAdminMenuClose = event => {
+    this.setState({ anchorEl: null });
+    this.handleMobileMenuClose();
+    this.setState({adminMenuOpen: false})
   };
 
   handleMenuClose = () => {
@@ -218,6 +239,21 @@ class PrimarySearchAppBar extends React.Component {
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
     const { isAuthenticated } = auth;
+
+    const renderMenuIsAdmin = (
+      <Menu
+        anchorEl={anchorEl}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        open={isMenuOpen}
+        onClose={this.handleAdminMenuClose}
+      >
+        <MenuItem onClick={this.handleMenuClose}><Link exact to="/admin/users" style={{ textDecoration: 'none' }}>Manage Users</Link></MenuItem>
+        <MenuItem onClick={this.handleMenuClose}><Link exact to="/admin/listings" style={{ textDecoration: 'none' }}>View All Listings</Link></MenuItem>
+        <MenuItem onClick={this.handleMenuClose}><Link exact to="/admin/flags" style={{ textDecoration: 'none' }}>Manage Flags</Link></MenuItem>
+        <MenuItem onClick={this.handleMenuClose}><Link exact to="/admin/customersupport" style={{ textDecoration: 'none' }}>Customer Service</Link></MenuItem>
+      </Menu>
+    );
 
     const renderMenuIsAuth = (
       <Menu
@@ -290,6 +326,14 @@ class PrimarySearchAppBar extends React.Component {
           </IconButton>
           <p>Profile</p>
         </MenuItem></Link>}
+        {isAuthenticated() && this.state.isAdmin &&
+        <Link exact to="/profile" style={{ textDecoration: 'none' }}>
+        <MenuItem onClick={this.handleAdminMenuOpen}>
+          <IconButton>
+            <SettingsIcon />
+          </IconButton>
+          <p>Admin Settings</p>
+        </MenuItem></Link>}
       </Menu>
     );
     return (
@@ -328,6 +372,11 @@ class PrimarySearchAppBar extends React.Component {
               >
                 <AccountCircle />
               </IconButton>
+              {isAuthenticated() && this.state.isAdmin && <IconButton aria-owns={this.state.adminMenuOpen ? 'material-appbar' : undefined}
+                aria-haspopup="true"
+                onClick={this.handleAdminMenuOpen}>
+              <SettingsIcon />
+              </IconButton>}
             </div>
             <div className={classes.sectionMobile}>
               <IconButton aria-haspopup="true" onClick={this.handleMobileMenuOpen}>
@@ -337,8 +386,9 @@ class PrimarySearchAppBar extends React.Component {
           </Toolbar>
         </AppBar>
         {this.state.showNotifications && this.state.notifications.length > 0 ? <Notifications notifications={this.state.notifications} /> : null}
-        {!isAuthenticated() && renderMenuNotAuth}
-        {isAuthenticated() && renderMenuIsAuth}
+        {!isAuthenticated() && !this.state.adminMenuOpen && renderMenuNotAuth}
+        {isAuthenticated() && !this.state.adminMenuOpen && renderMenuIsAuth}
+        {isAuthenticated() && this.state.isAdmin && this.state.adminMenuOpen && renderMenuIsAdmin}
         {renderMobileMenu}
       </div>
     );

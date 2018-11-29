@@ -64,6 +64,10 @@ class CardItem extends React.Component {
                 return results.json()
             }).then(data => {
             this.setState({...data})
+            this.setState({bidHistory: data.bid_history})
+            if (this.state.bidHistory.length > 0) {
+              this.setState({startPrice: this.state.bidHistory[this.state.bidHistory.length-1].bidPrice})
+            }
             if (moment(Date.now()).isAfter(moment(this.state.endTime))) {
               this.setState({remainingTime: "Expired"})
             } else {
@@ -89,9 +93,12 @@ class CardItem extends React.Component {
                     <Typography color="textSecondary">
                         Quantity: {this.state.quantity || "Not Specified"}
                     </Typography>
+                    {this.props.showBought && this.state.soldFlag ? <Typography color="textSecondary">
+                        SOLD
+                    </Typography> :
                     <Typography color="textSecondary">
                         Time Remaining: {this.state.remainingTime}
-                    </Typography>
+                    </Typography>}
                     <Typography color="textSecondary">
                         Bid Price: ${this.state.startPrice || "Not Specified"}
                     </Typography>
