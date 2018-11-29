@@ -46,8 +46,8 @@ class CardItem extends React.Component {
             remainingTime: ""
         };
         this.getItem = this.getItem.bind(this);
-        // calendar item
-        this.createIcs = this.createIcs.bind(this)
+        // TODO: calendar item
+        // this.createIcs = this.createIcs.bind(this) Temporarily disabled to prevent problems.
         // removed
         // this.removeFromWatchlist = this.removeFromWatchlist.bind(this)
     }
