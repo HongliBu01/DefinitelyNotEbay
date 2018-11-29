@@ -1,2 +1,0 @@
-import createEvent from 'ics';
-

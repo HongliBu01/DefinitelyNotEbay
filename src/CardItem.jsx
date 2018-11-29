@@ -8,6 +8,7 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import { Link } from 'react-router-dom'
 import moment from 'moment'
+// import Calendar from './iCalendar/Calendar';
 
 const styles = {
     card: {
@@ -44,7 +45,9 @@ class CardItem extends React.Component {
             startPrice: "",
             remainingTime: ""
         };
-        this.getItem = this.getItem.bind(this)
+        this.getItem = this.getItem.bind(this);
+        // calendar item
+        this.createIcs = this.createIcs.bind(this)
         // removed
         // this.removeFromWatchlist = this.removeFromWatchlist.bind(this)
     }
@@ -71,6 +74,10 @@ class CardItem extends React.Component {
     }
 
     // remove from watchlist is not in item page
+    // Creating calendar event:
+    // createIcs(item, des, start, end){
+    //     Calendar().createIcs(item, des, start, end);
+    // }
 
     render() {
         return (
@@ -99,7 +106,7 @@ class CardItem extends React.Component {
                     <Link to={`/item/${this.state.itemID }`|| null} style={{ textDecoration: 'none' }}><Button size="small">Learn More</Button></Link>
                 </CardActions>
                 {/*<CardActions>*/}
-                    {/*<Button onClick={()=>this.removeFromWatchlist()} size="small">Remove From Watchlist</Button>*/}
+                    {/*<Button onClick={()=>this.createIcs("new", "newitem", [2018, 5, 30, 6, 30], [2018, 5, 31, 6, 30])} size="small">Add Expiration Reminder</Button>*/}
                 {/*</CardActions> this should not be here.*/}
             </Card>
         );
