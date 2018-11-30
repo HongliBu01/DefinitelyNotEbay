@@ -81,9 +81,7 @@ class MainPage extends React.Component {
       .then(results => {
         return results.json()
       }).then(data => {
-          console.log(data)
           data.sort(function(a, b){return moment(a.endTime).isBefore(moment(b.endTime)) ? -1 : 1})
-          console.log("Sorted", data)
           this.setState({allItems: data})
       });
   }
@@ -129,7 +127,15 @@ class MainPage extends React.Component {
   }
 
   endSort(sortType) {
-    //Sort by recent ending
+    if (sortType === 'recentSort') {
+      var allItems = this.state.allItems
+      allItems.sort(function(a, b){return moment(a.endTime).isBefore(moment(b.endTime)) ? -1 : 1})
+      this.setState({allItems})
+    } else {
+      var allItems = this.state.allItems
+      allItems.sort(function(a, b){return moment(a.endTime).isBefore(moment(b.endTime)) ? 1 : -1})
+      this.setState({allItems})
+    }
   }
 
   handleChange = name => event => {
@@ -236,7 +242,7 @@ class MainPage extends React.Component {
           onChange={this.handleChange("search")}
         />
       <div style={{margin: '10px'}}>
-      {this.state.currentItems.length > 0 || this.state.selectedCategories.length > 0 ? this.state.currentItems.map((item, i) => <CardItem key={item._id.$oid} itemID={item._id.$oid ? item._id.$oid : item._id} />) : this.state.allItems.map((item, i) => <CardItem key={item._id.$oid} itemID={item._id.$oid ? item._id.$oid : item._id} />)}
+      {this.state.currentItems.length > 0 || this.state.selectedCategories.length > 0 || this.state.activeType !== 'all' ? this.state.currentItems.map((item, i) => <CardItem key={item._id.$oid} itemID={item._id.$oid ? item._id.$oid : item._id} />) : this.state.allItems.map((item, i) => <CardItem key={item._id.$oid} itemID={item._id.$oid ? item._id.$oid : item._id} />)}
       </div>
       </div> : <p> You are not authorized to view this page </p>} </div>
     )
