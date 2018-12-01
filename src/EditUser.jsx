@@ -11,6 +11,9 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 
+import Auth from './Auth/Auth'
+const auth = new Auth();
+
 
 // TODO: Sanitize inputs
 // TODO: Add functionality to suspend and delete account
@@ -107,19 +110,27 @@ class EditUser extends React.Component {
 
   deleteAccount() {
     const userID = this.state._id;
-    if (userID !== this.state.profile.sub) {
-          console.log("deleting " + userID);
-          // TODO: Pop a confirmation?
-          fetch(`/api/users/${userID}`,
-              {method: "DELETE"})
-              .then(result => {
-                  console.log("deleted" + result.json()["_id"]);
-                  return result.json()
-              })
-      } else {
-        console.log("don't delete yourself.");
-        alert("Do not delete yourself.") // TODO: find a way to properly delete yourself.
-      }
+    // Pop a confirmation
+    if (confirm("We are sorry to see you go...\nAre you sure you want to delete your account?")) {
+        console.log("deleting " + userID);
+        // TODO: does this redirects already?
+        auth.logout();
+        // Call delete route
+        fetch(`/api/users/${userID}`,
+            {method: "DELETE"})
+            .then(result => {
+                console.log("deleted" + result.json()["_id"]);
+                return result.json()
+            }).then(data => {
+                if (data._id) {
+                    this.setState({redirect: true})
+                }
+        })
+    } else {
+        alert("Deleten't yourself.");
+        console.log("Deleten't yourself.");
+    }
+
   }
 
   render() {
