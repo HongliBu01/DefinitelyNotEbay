@@ -251,7 +251,7 @@ class PrimarySearchAppBar extends React.Component {
         <MenuItem onClick={this.handleMenuClose}><Link exact to="/admin/users" style={{ textDecoration: 'none' }}>Manage Users</Link></MenuItem>
         <MenuItem onClick={this.handleMenuClose}><Link exact to="/admin/listings" style={{ textDecoration: 'none' }}>View All Listings</Link></MenuItem>
         <MenuItem onClick={this.handleMenuClose}><Link exact to="/admin/categories" style={{ textDecoration: 'none' }}>Manage Categories</Link></MenuItem>
-        <MenuItem onClick={this.handleMenuClose}><Link exact to="/admin/customersupport" style={{ textDecoration: 'none' }}>Customer Service</Link></MenuItem>
+        <MenuItem onClick={this.handleMenuClose}><Link exact to="/admin/customersupport" style={{ textDecoration: 'none' }}>Customer Support</Link></MenuItem>
       </Menu>
     );
 
@@ -266,6 +266,7 @@ class PrimarySearchAppBar extends React.Component {
         <MenuItem onClick={this.handleMenuClose}><Link exact to="/profile" style={{ textDecoration: 'none' }}>Profile</Link></MenuItem>
         <MenuItem onClick={this.handleMenuClose}><Link exact to="/account" style={{ textDecoration: 'none' }}>My Account</Link></MenuItem>
         <MenuItem onClick={this.handleMenuClose}><Link exact to="/watchlist" style={{ textDecoration: 'none' }}>Watchlist</Link></MenuItem>
+        <MenuItem onClick={this.handleMenuClose}><Link exact to="/contact" style={{ textDecoration: 'none' }}>Contact</Link></MenuItem>
         <MenuItem onClick={this.logout.bind(this)}>Logout</MenuItem>
       </Menu>
     );
