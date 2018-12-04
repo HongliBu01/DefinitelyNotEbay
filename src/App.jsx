@@ -14,6 +14,8 @@ import ShoppingCartPage from './ShoppingCartPage.jsx'
 import AdminMainPage from './AdminMain.jsx'
 import CheckoutPage from './CheckOut.jsx'
 import FlaggedItemsPage from './FlaggedItemsPage.jsx'
+import ContactPage from './ContactPage.jsx'
+import AdminSupportPage from './AdminSupportPage.jsx'
 
 class App extends React.Component {
   render() {
@@ -33,6 +35,7 @@ class App extends React.Component {
           <Route path="/addItem" render={(props) => <AddItem auth={auth} {...props}/>} />
           <Route path="/profile" render={(props) => <Profile auth={auth} {...props}/>} />
           <Route path="/item/:id" render={(props) => <ItemPage auth={auth} {...props}/>} />
+          <Route exact path="/contact" render={(props) => <ContactPage auth={auth} {...props} />} />
           <Route exact path="/watchlist" render={(props) => <WatchListPage auth={auth} {...props}/>} />
           <Route exact path="/account" render={(props) => <EditUser auth={auth} {...props}/>} />
           <Route exact path="/cart" render={(props) => <ShoppingCartPage auth={auth} {...props}/>} />
@@ -40,7 +43,7 @@ class App extends React.Component {
           <Route exact path="/admin/users" render={(props) => <UserPage auth={auth} {...props}/>} />
           <Route exact path="/admin/listings" render={(props) => <AdminMainPage auth={auth} {...props}/>} />
           <Route exact path="/admin/flags" render={(props) => <FlaggedItemsPage auth={auth} {...props}/>} />
-          <Route exact path="/admin/customersupport" render={(props) => <AdminMainPage auth={auth} {...props}/>} />
+          <Route exact path="/admin/support" render={(props) => <AdminSupportPage auth={auth} {...props}/>} />
           {/*
           <Route exact path="users/:user_id/buy_history" component={BuyHistoryPage}
           <Route exact path="users/:user_id/bid_history" component={BidHistoryPage}

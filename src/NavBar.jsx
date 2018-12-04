@@ -326,6 +326,14 @@ class PrimarySearchAppBar extends React.Component {
           </IconButton>
           <p>Profile</p>
         </MenuItem></Link>}
+        {isAuthenticated() &&
+        <Link exact to="/contact" style={{ textDecoration: 'none' }}>
+          <MenuItem>
+          <IconButton>
+            <MailIcon />
+          </IconButton>
+          <p>Contact Support</p>
+        </MenuItem></Link>}
         {isAuthenticated() && this.state.isAdmin &&
         <Link exact to="/profile" style={{ textDecoration: 'none' }}>
         <MenuItem onClick={this.handleAdminMenuOpen}>
