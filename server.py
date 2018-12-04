@@ -63,19 +63,32 @@ def createUser():
   return json.dumps(res.inserted_id, default=json_util.default)
 
 
-@app.route('/api/users/<user_id>', methods=['GET', 'PUT', 'DELETE'])
+@app.route('/api/users/<user_id>', methods=['GET', 'PUT'])
 def handleUser(user_id):
 
-  if request.method == 'GET':
+    if request.method == 'GET':
+        user = mongo.db.users.find_one({"_id": user_id})
+        return json.dumps(user, default=json_util.default)
+
+    if request.method == 'PUT':
+        newUser = request.get_json(force=True)
+        user = mongo.db.users.find_one_and_update({"_id": user_id}, {"$set": newUser})
+        return json.dumps(user, default=json_util.default)
+
+
+@app.route('/api/users/<user_id>', methods=['DELETE'])
+def deleteUser(user_id):
+    # TODO: go through bid history and delete corresponding records
     user = mongo.db.users.find_one({"_id": user_id})
-    return json.dumps(user, default=json_util.default)
-
-  if request.method == 'PUT':
-    newUser = request.get_json(force=True)
-    user = mongo.db.users.find_one_and_update({"_id": user_id}, {"$set": newUser})
-    return json.dumps(user, default=json_util.default)
-
-  if request.method == 'DELETE':
+    # Delete all bids in corresponding items
+    if "bid_history" in user.keys():
+        for the_bid in user["bid_history"]:
+            mongo.db.items.update({"_id": ObjectId(the_bid["itemID"])},
+                                  {"$pull": {"bid_history": {"userID": the_bid["userID"]}}},
+                                  multi=True)
+            # TODO: Verification?
+    mongo.db.items.delete_many({"seller": user_id})
+    # Delete user
     res = mongo.db.users.delete_one({"_id": user_id})
     return json.dumps(res, default=json_util.default)
 
