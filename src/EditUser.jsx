@@ -11,8 +11,6 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 
-import Auth from './Auth/Auth'
-const auth = new Auth();
 
 
 // TODO: Sanitize inputs
@@ -114,18 +112,19 @@ class EditUser extends React.Component {
     if (confirm("We are sorry to see you go...\nAre you sure you want to delete your account?")) {
         console.log("deleting " + userID);
         // TODO: does this redirects already?
-        auth.logout();
+        this.props.auth.logout();
         // Call delete route
         fetch(`/api/users/${userID}`,
             {method: "DELETE"})
             .then(result => {
                 console.log("deleted" + result.json()["_id"]);
                 return result.json()
-            }).then(data => {
-                if (data._id) {
-                    this.setState({redirect: true})
-                }
-        })
+            })
+        //     .then(data => {
+        //         if (data._id) {
+        //             this.setState({redirect: true})
+        //         }
+        // })
     } else {
         alert("Deleten't yourself.");
         console.log("Deleten't yourself.");
