@@ -18,6 +18,7 @@ import AdminSupportPage from './AdminSupportPage.jsx'
 import CategoryPage from './CategoryPage.jsx'
 import BidHistoryPage from './BidHistoryPage.jsx'
 import BuyHistory from './BuyHistory.jsx'
+import UserListings from './UserListings.jsx'
 
 class App extends React.Component {
   render() {
@@ -48,6 +49,7 @@ class App extends React.Component {
           <Route exact path="/admin/categories" render={(props) => <CategoryPage auth={auth} {...props}/>} />
           <Route exact path="/admin/customersupport" render={(props) => <AdminSupportPage auth={auth} {...props}/>} />
           <Route exact path="/buyHistory" render={(props) => <BuyHistory auth={auth} {...props}/>} />
+          <Route exact path="/listings" render={(props) => <UserListings auth={auth} {...props}/>} />
           <Route path="/callback" render={(props) => {
             handleAuthentication(props);
             return <Callback {...props} />

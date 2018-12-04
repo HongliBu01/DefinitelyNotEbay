@@ -217,7 +217,8 @@ def bid(item_id):
 # Get BID HISTORY (Similar to watchlist)
 @app.route('/api/users/<user_id>/bid_history', methods=['GET'])
 def bid_history(user_id):
-        bids = mongo.db.users.find_one({"_id": user_id})['bidHistory']
+        bids = mongo.db.users.find_one({"_id": user_id})
+        bids = bids["bidHistory"]
         if not bids:
             return json.dumps(bids, default=json_util.default)
         formatted_bids = {}

@@ -11,7 +11,7 @@ class BidHistoryPage extends React.Component {
     super(props);
     this.state = {
         profile: {},
-        bids:{}
+        bids:[]
     };
     this.getBids = this.getBids.bind(this)
   }
@@ -21,35 +21,44 @@ class BidHistoryPage extends React.Component {
      if (!userProfile) {
       getProfile((err, profile) => {
         this.setState({profile});
-        this.getBids()
+        this.getBids(profile.sub)
       })
      } else {
        this.setState({ profile: userProfile });
-       this.getBids()
+       this.getBids(userProfile.sub)
      }
      // this.getWatchList() why here is not OK? -- gets "undefined"
   }
 
-  getBids() {
-    const userID = this.state.profile.sub;
-      console.log(userID);
+  getBids(userID) {
     fetch(`/api/users/${userID}/bid_history`)
       .then(results => {
         return results.json()
       }).then(data => {
-        console.log("BIDS", data);
-        this.setState({bids: data})
+        var bids = []
+        for (var key in data) {
+          var bid = {}
+          bid["id"] = key
+          bid["bids"] = data[key]
+          bids.push(bid)
+        }
+        this.setState({bids})
     })
   }
 
   render() {
+    console.log("BIDS", this.state.bids);
     return (
       <div>
-          <Typography component="h2" variant="h1" gutterBottom>
-              This is your Watchlist:
-          </Typography>
-          {this.state.bids.map((item, i) => <CardItem showBought={true} itemID={item._id}/>)}
-
+        <h2>Bid History</h2>
+        {this.state.bids.length === 0 ? <p> No bids </p> : <div>
+        {this.state.bids.map((bid) =>
+          <div>
+          <p> Bids: {bid["bids"]} </p>
+          <CardItem showBought={true} itemID={bid["id"]}/>
+          </div>
+        )}
+        </div>}
       </div>
     )
   }
