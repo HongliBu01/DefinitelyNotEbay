@@ -13,7 +13,6 @@ import WatchListPage from './WatchListPage.jsx'
 import ShoppingCartPage from './ShoppingCartPage.jsx'
 import AdminMainPage from './AdminMain.jsx'
 import CheckoutPage from './CheckOut.jsx'
-import FlaggedItemsPage from './FlaggedItemsPage.jsx'
 
 class App extends React.Component {
   render() {
@@ -38,8 +37,7 @@ class App extends React.Component {
           <Route exact path="/cart" render={(props) => <ShoppingCartPage auth={auth} {...props}/>} />
           <Route exact path="/checkout" render={(props) => <CheckoutPage auth={auth} {...props}/>} />
           <Route exact path="/admin/users" render={(props) => <UserPage auth={auth} {...props}/>} />
-          <Route exact path="/admin/listings" render={(props) => <AdminMainPage auth={auth} {...props}/>} />
-          <Route exact path="/admin/flags" render={(props) => <FlaggedItemsPage auth={auth} {...props}/>} />
+          <Route exact path="/admin/listings" render={(props) => <AdminMainPage auth={auth} {...props}/>} />\
           <Route exact path="/admin/customersupport" render={(props) => <AdminMainPage auth={auth} {...props}/>} />
           {/*
           <Route exact path="users/:user_id/buy_history" component={BuyHistoryPage}
