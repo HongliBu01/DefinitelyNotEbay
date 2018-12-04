@@ -88,28 +88,6 @@ class MainPage extends React.Component {
     })
   }
 
-  getCart() {
-    // fetch('/api/users/5bdd060508ffae36201e3a79/cart') // TODO: URL Parsing, get correct userID
-      fetch('/api/users/google-oauth2|101445531905307187466/cart') //changed to use another id
-      .then(results => {
-        return results.json()
-      }).then(data => {
-        console.log(data)
-        this.setState({cartItems: data})
-      })
-  }
-
-  getWatchlist() {
-    fetch('/api/users/google-oauth2|101445531905307187466/watchlist') // TODO: URL Parsing
-    // changed to use another id, also from "cart" to "watchlist
-      .then(results => {
-        return results.json()
-      }).then(data => {
-        console.log(data)
-        this.setState({watchlistItems: data})
-      })
-  }
-
   endSort(sortType) {
     if (sortType === 'recentSort') {
       var allItems = this.state.allItems
