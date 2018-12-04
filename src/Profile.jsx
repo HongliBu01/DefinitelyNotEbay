@@ -65,7 +65,7 @@ class Profile extends React.Component {
         <p> <Link to={`/watchlist`}> Watchlist </Link> </p>
         <p> <Link to={`/cart`}> Cart </Link> </p>
         <p> <Link to={`/users/${this.state._id}/buy_history`}> Past Purchases </Link> </p>
-        <p> <Link to={`/users/${this.state._id}/bid_history`}> Past Bids </Link></p>
+        <p> <Link to={`/bid_history`}> Past Bids </Link></p>
         <p> <Link to={`/users/${this.state._id}/item_history`}> Your Item Listings </Link></p>
 
         <h1> My Account </h1>

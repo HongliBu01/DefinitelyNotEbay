@@ -14,6 +14,7 @@ import ShoppingCartPage from './ShoppingCartPage.jsx'
 import AdminMainPage from './AdminMain.jsx'
 import CheckoutPage from './CheckOut.jsx'
 import CategoryPage from './CategoryPage.jsx'
+import BidHistoryPage from './BidHistoryPage.jsx'
 
 class App extends React.Component {
   render() {
@@ -35,6 +36,7 @@ class App extends React.Component {
           <Route path="/item/:id" render={(props) => <ItemPage auth={auth} {...props}/>} />
           <Route exact path="/watchlist" render={(props) => <WatchListPage auth={auth} {...props}/>} />
           <Route exact path="/account" render={(props) => <EditUser auth={auth} {...props}/>} />
+          <Route exact path="/bid_history" render={(props) => <BidHistoryPage auth={auth} {...props}/>} />
           <Route exact path="/cart" render={(props) => <ShoppingCartPage auth={auth} {...props}/>} />
           <Route exact path="/checkout" render={(props) => <CheckoutPage auth={auth} {...props}/>} />
           <Route exact path="/admin/users" render={(props) => <UserPage auth={auth} {...props}/>} />
