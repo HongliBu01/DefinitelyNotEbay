@@ -224,7 +224,7 @@ def bid_history(user_id):
         formatted_bids = {}
         for single_bid in bids:
             if single_bid["itemID"] in formatted_bids:
-                formatted_bids[single_bid["itemID"]] = formatted_bids[single_bid["itemID"]].append(single_bid["bidPrice"])
+                formatted_bids[single_bid["itemID"]].append(single_bid["bidPrice"])
             else:
                 formatted_bids[single_bid["itemID"]] = [single_bid["bidPrice"]]
         return json.dumps(formatted_bids, default=json_util.default)

@@ -54,7 +54,7 @@ class BidHistoryPage extends React.Component {
         {this.state.bids.length === 0 ? <p> No bids </p> : <div>
         {this.state.bids.map((bid) =>
           <div>
-          <p> Bids: {bid["bids"]} </p>
+          <p> Bids: {bid["bids"].join(", ")} </p>
           <CardItem showBought={true} itemID={bid["id"]}/>
           </div>
         )}
