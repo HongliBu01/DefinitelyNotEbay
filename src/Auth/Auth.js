@@ -7,8 +7,9 @@ export default class Auth {
     domain: AUTH_CONFIG.domain,
     clientID: AUTH_CONFIG.clientId,
     redirectUri: AUTH_CONFIG.callbackUrl,
+    audience: AUTH_CONFIG.apiUrl,
     responseType: 'token id_token',
-    scope: 'openid email'
+    scope: 'openid email read:users update:users',
   });
 
   constructor() {
@@ -19,6 +20,7 @@ export default class Auth {
     this.getProfile = this.getProfile.bind(this)
     this.getIdToken = this.getIdToken.bind(this)
     this.getAccessToken = this.getAccessToken.bind(this)
+    this.editUser= this.editUser.bind(this);
   }
 
   getProfile(callback) {
@@ -98,7 +100,7 @@ export default class Auth {
       } else if (err) {
         history.replace('/');
         console.log(err);
-        alert(`Error: ${err.error}. Check the console for further details.`);
+        //alert(`Error: ${err.error}. Check the console for further details.`);
       }
     });
   }
@@ -129,5 +131,50 @@ export default class Auth {
     // access token's expiry time
     let expiresAt = JSON.parse(localStorage.getItem('expires_at'));
     return new Date().getTime() < expiresAt;
+  }
+
+  editUser(state) {
+    fetch('/api/token', {
+      method: 'GET',
+    }).then(results => {
+      return results.json();
+    }).then(data => {
+      const token = data['access_token'];
+      fetch(`https://${AUTH_CONFIG.domain}/api/v2/users/${state.profile.sub}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: state.email
+        })
+      }).then(results => {
+        console.log(results);
+        return results.json()
+      }).then(data => {
+        console.log(data);
+      });
+    });
+  }
+
+  deleteUser(userID) {
+    fetch('/api/token', {
+      method: 'GET',
+    }).then(results => {
+      return results.json();
+    }).then(data => {
+      const token = data['access_token'];
+      fetch(`https://${AUTH_CONFIG.domain}/api/v2/users/${userID}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
+      }).then(results => {
+        console.log(results);
+        return results;
+      });
+    });
   }
 }
