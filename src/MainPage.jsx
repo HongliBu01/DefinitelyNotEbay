@@ -35,7 +35,8 @@ class MainPage extends React.Component {
       categories: [],
       selectedCategories: [],
       search: "",
-      profile: {}
+      profile: {},
+      sortType: 'recentSort'
     };
 
     this.getItems = this.getItems.bind(this)
@@ -43,6 +44,7 @@ class MainPage extends React.Component {
     this.filterCategory = this.filterCategory.bind(this)
     this.handleChange = this.handleChange.bind(this)
     this.searchItems = this.searchItems.bind(this)
+    this.endSort = this.endSort.bind(this)
   }
 
   componentWillMount() {
@@ -72,6 +74,7 @@ class MainPage extends React.Component {
               allItems.push(item)
             }
           })
+          allItems.sort(function(a, b){return moment(a.endTime).isBefore(moment(b.endTime)) ? -1 : 1})
           this.setState({allItems: allItems})
       });
   }
@@ -85,26 +88,16 @@ class MainPage extends React.Component {
     })
   }
 
-  getCart() {
-    // fetch('/api/users/5bdd060508ffae36201e3a79/cart') // TODO: URL Parsing, get correct userID
-      fetch('/api/users/google-oauth2|101445531905307187466/cart') //changed to use another id
-      .then(results => {
-        return results.json()
-      }).then(data => {
-        console.log(data)
-        this.setState({cartItems: data})
-      })
-  }
-
-  getWatchlist() {
-    fetch('/api/users/google-oauth2|101445531905307187466/watchlist') // TODO: URL Parsing
-    // changed to use another id, also from "cart" to "watchlist
-      .then(results => {
-        return results.json()
-      }).then(data => {
-        console.log(data)
-        this.setState({watchlistItems: data})
-      })
+  endSort(sortType) {
+    if (sortType === 'recentSort') {
+      var allItems = this.state.allItems
+      allItems.sort(function(a, b){return moment(a.endTime).isBefore(moment(b.endTime)) ? -1 : 1})
+      this.setState({allItems})
+    } else {
+      var allItems = this.state.allItems
+      allItems.sort(function(a, b){return moment(a.endTime).isBefore(moment(b.endTime)) ? 1 : -1})
+      this.setState({allItems})
+    }
   }
 
   handleChange = name => event => {
@@ -116,6 +109,9 @@ class MainPage extends React.Component {
     }
     if (name === "search") {
       this.searchItems(event.target.value)
+    }
+    if (name === "listingSort") {
+      this.endSort(event.target.value)
     }
   }
 
@@ -169,6 +165,13 @@ class MainPage extends React.Component {
           <MenuItem key={name} value={name}> {name}
           </MenuItem>
         ))}
+      </Select>
+      <Select
+        value={this.state.sortType}
+        onChange={this.handleChange("listingSort")}
+      >
+      <MenuItem key={'recentSort'} value={'recentSort'}> Most Recent </MenuItem>
+      <MenuItem key={'oldestSort'} value={'oldestSort'}> Oldest </MenuItem>
       </Select>
       <TextField
           id="standard-search"

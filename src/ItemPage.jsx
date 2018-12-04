@@ -224,7 +224,21 @@ class ItemPage extends React.Component {
     }
 
   reportItem() {
-    console.log("REPORT")
+    const itemID = this.state.itemID;
+    fetch(`/api/items/${itemID}`, {
+      method: "PUT",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        reportFlag: true
+      })
+    }).then(results => {
+      return results.json()
+    }).then(data => {
+      console.log(data)
+    })
   }
 
   handleEditSubmit() {
@@ -341,7 +355,7 @@ class ItemPage extends React.Component {
         {/*remove from watchlist*/}
         <Button variant="contained" onClick={()=>this.removeFromWatchlist()}>Remove from Watchlist</Button>
         <Button variant="contained" onClick={()=>this.reportItem()}>Report Item </Button>
-
+          {this.state.reportFlag && <p> This item has been reported </p>}
         <div>
         {this.state.profile && this.state.seller === this.state.profile.sub && <Button variant="contained" onClick={()=>this.toggleEdit()}> Edit Listing </Button>}
          {this.state.canEdit &&

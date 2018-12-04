@@ -16,6 +16,7 @@ import os
 import json
 import datetime, time
 import config
+import requests
 from bson.objectid import ObjectId
 from bson import json_util
 from flask import Flask, render_template, request
@@ -46,6 +47,17 @@ mongo = PyMongo(app)
 def index():
     return render_template('index.html')
 
+
+@app.route('/api/token', methods=['GET'])
+def getToken():
+    url = config.AUTH_CONFIG['tokenUrl']
+    payload = config.AUTH_CONFIG['tokenPayload']
+    headers = {'content-type': "application/json"}
+    res = requests.post(url, data=payload, headers=headers)
+    data = json.loads(res.text)
+    # print('***', data)
+    # print(data['access_token'])
+    return json.dumps(data, default=json_util.default)
 
 # USER STUFF
 @app.route('/api/users', methods=['GET'])
@@ -90,35 +102,78 @@ def deleteUser(user_id):
     mongo.db.items.delete_many({"seller": user_id})
     # Delete user
     res = mongo.db.users.delete_one({"_id": user_id})
-    return json.dumps(res, default=json_util.default)
+    print(res)
+    return '', 204
 
 
 # ITEM STUFF
 @app.route("/api/items", methods=['GET'])
 def findAllItems():
     items = []
-    # TODO: Check if time period has ended. If true, move item to last bidder's cart with type "bid" and mark not active
+	# Check if time period has ended. If true, move item to last bidder's cart with type "bid" and mark not active
     for item in mongo.db.items.find():
-        # If item endTime has past
-        # Check if item is sold
-        # Check length of bid_history. If it's greater than 0, then move it to winner's cart and mark as sold
-        items.append(item)
+        if "soldFlag" not in item:
+            mongo.db.items.find_one_and_update({"_id" : item["_id"]}, {"$set": {"soldFlag": False}})
+    for item in mongo.db.items.find():
+        endtime= datetime.datetime.strptime(item["endTime"], "%Y-%m-%dT%H:%M")
+        if item["soldFlag"] == False:
+            if endtime <= datetime.datetime.now():
+                bidLen = len(item["bid_history"])
+                if bidLen > 0:
+                    winnerID = item["bid_history"][bidLen - 1]["userID"]
+                    winnerPrice =  float(item["bid_history"][bidLen - 1]["bidPrice"])
+                    winner = mongo.db.users.find_one({"_id": winnerID})
+                    if "cart" not in winner:
+                        winner["cart"] = []
+                    alreadyInCart = False
+                    for itemInCart in mongo.db.users.find_one({"_id" : winnerID})["cart"]:
+                        if itemInCart["_id"] ==  str(item["_id"]) or itemInCart["_id"] ==  item["_id"]:
+                            alreadyInCart = True
+                            break
+                    if not alreadyInCart:
+                        winner["cart"].append({"_id" : str(item["_id"]), "price" : winnerPrice, "type" : "bid"})
+                        mongo.db.users.find_one_and_update({"_id": winnerID}, {"$set": {"cart": winner["cart"]}})
+                    mongo.db.items.find_one_and_update({"_id" : item["_id"]}, {"$set": {"soldFlag": True}})
+            else:
+                items.append(item)
     return json.dumps(items, default=json_util.default)
 
 @app.route("/api/items", methods=['POST'])
 def createItem():
     itemData = request.get_json(force=True)
     mongo.db.items.insert_one(itemData)
-    # TODO: append _id.$oid into itemData.seller's listings
+    # Store in user's listings
+    seller = mongo.db.users.find_one({"_id": itemData['seller']})
+    seller["listing"].append(itemData['_id']['$oid'])
+    mongo.db.users.find_one_and_update({"_id": itemData['seller']}, {"$set": seller})
     return json.dumps(itemData, default=json_util.default)
 
 @app.route("/api/items/<item_id>", methods=['GET', 'PUT', 'DELETE'])
 def handleItem(item_id):
     if request.method == 'GET':
         itemData = mongo.db.items.find_one_or_404({"_id": ObjectId(item_id)})
-        # If item endTime has past
-        # Check if item is sold
-        # Check length of bid_history. If it's greater than 0, then move it to winner's cart and mark as sold
+        if "soldFlag" not in itemData:
+            mongo.db.items.find_one_and_update({"_id" : itemData["_id"]}, {"$set": {"soldFlag": False}})
+        endtime= datetime.datetime.strptime(itemData["endTime"], "%Y-%m-%dT%H:%M")
+        if itemData["soldFlag"] == False:
+            if endtime <= datetime.datetime.now():
+                bidLen = len(itemData["bid_history"])
+                if bidLen > 0:
+                    winnerID = itemData["bid_history"][bidLen - 1]["userID"]
+                    winnerPrice =  float(itemData["bid_history"][bidLen - 1]["bidPrice"])
+                    winner = mongo.db.users.find_one({"_id": winnerID})
+                    if "cart" not in winner:
+                        winner["cart"] = []
+                    alreadyInCart = False
+                    for itemInCart in mongo.db.users.find_one({"_id" : winnerID})["cart"]:
+                        if itemInCart["_id"] ==  str(itemData["_id"]) or itemInCart["_id"] ==  itemData["_id"]:
+                            alreadyInCart = True
+                            break
+                    if not alreadyInCart:
+                        winner["cart"].append({"_id" : str(itemData["_id"]), "price" : winnerPrice, "type" : "bid"})
+                        mongo.db.users.find_one_and_update({"_id": winnerID}, {"$set": {"cart": winner["cart"]}})
+                    mongo.db.items.find_one_and_update({"_id" : itemData["_id"]}, {"$set": {"soldFlag": True}})
+                    itemData["soldFlag"] = True
         return json.dumps(itemData, default=json_util.default)
 
     if request.method == 'PUT':
@@ -132,7 +187,7 @@ def handleItem(item_id):
         print(res)
 
 
-# BID STUFF
+# BID STUFF. No longer used because replaced with socket
 @app.route('/api/items/<item_id>/bid', methods=['POST'])
 def bid(item_id):
     new_bid = request.get_json(force=True)
@@ -250,6 +305,18 @@ def notificationsRead(user_id):
     user["notifications"] = notifications
     mongo.db.users.find_one_and_update({"_id": user_id}, {"$set": user})
     return json.dumps(notifications, default=json_util.default)
+
+@app.route('/api/feedback', methods=['GET','POST'])
+def handle_feedback():
+    if request.method == 'GET':
+        feedbacks = []
+        for feedback in mongo.db.feedback.find():
+            feedbacks.append(feedback)
+        return json.dumps(feedbacks, default=json_util.default)
+    else:
+        feedback = request.get_json(force=True)
+        mongo.db.feedback.insert_one(feedback)
+        return json.dumps(feedback, default=json_util.default)
 
 @socketio.on('bid')
 def handle_bid(bid):
