@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom'
 // Only admin should be authorized to see this
 // Can change toggle isAdmin/isActive? -- to edit user
 
-// TODO: Set up button functionality
 class UserPage extends React.Component {
   constructor(props) {
     super(props);
@@ -90,22 +89,24 @@ class UserPage extends React.Component {
 
   deleteUser(userID) {
       console.log("Delete:" + userID);
-      console.log(this.state.profile.sub)
-      if (userID !== this.state.profile.sub) {
-          console.log("deleting " + userID)
-          // TODO: Pop a confirmation?
-          this.props.auth.deleteUser(userID)
-          fetch(`/api/users/${userID}`,
-              {method: "DELETE"})
-              .then(result => {
-                  console.log("deleted" + result.json()["_id"]);
-                  return result.json()
+      console.log(this.state.profile.sub);
+      if (userID !== this.state.profile.sub) { // No self deletion here. Go to your own account to do that
+          console.log("deleting " + userID);
+              // No logout
+              this.props.auth.deleteUser(userID)
+              fetch(`/api/users/${userID}`,
+                  {method: "DELETE"})
+                  .then(result => {
+                      console.log("deleted" + result.json()["_id"]);
+                      return result.json()
+                  }).then(data => {
+                      if (data._id) {
+                          location.reload()
+                      }
               })
-      } else {
-        console.log("don't delete yourself.");
-        alert("Do not cancel your own admin status.")
+          } else {
+              console.log("Deletn't yourself.\nNo self deletion here.\nGo to your own account to do that");
       }
-
   }
 
   makeAdmin(user) { // TODO: Merge this with suspend to flipFlag()
