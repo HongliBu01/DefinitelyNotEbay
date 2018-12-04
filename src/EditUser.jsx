@@ -113,19 +113,14 @@ class EditUser extends React.Component {
     if (confirm("We are sorry to see you go...\nAre you sure you want to delete your account?")) {
         console.log("deleting " + userID);
         // TODO: does this redirects already?
+        this.props.auth.deleteUser(userID);
         this.props.auth.logout();
         // Call delete route
         fetch(`/api/users/${userID}`,
             {method: "DELETE"})
             .then(result => {
-                console.log("deleted" + result.json()["_id"]);
-                return result.json()
+                return result
             })
-        //     .then(data => {
-        //         if (data._id) {
-        //             this.setState({redirect: true})
-        //         }
-        // })
     } else {
         alert("Deleten't yourself.");
         console.log("Deleten't yourself.");

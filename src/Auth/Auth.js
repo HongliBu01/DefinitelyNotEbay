@@ -173,9 +173,7 @@ export default class Auth {
         }
       }).then(results => {
         console.log(results);
-        return results.json()
-      }).then(data => {
-        console.log(data);
+        return results;
       });
     });
   }

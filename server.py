@@ -102,7 +102,8 @@ def deleteUser(user_id):
     mongo.db.items.delete_many({"seller": user_id})
     # Delete user
     res = mongo.db.users.delete_one({"_id": user_id})
-    return json.dumps(res, default=json_util.default)
+    print(res)
+    return '', 204
 
 
 # ITEM STUFF

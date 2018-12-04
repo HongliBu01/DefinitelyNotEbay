@@ -23,7 +23,7 @@ class UserPage extends React.Component {
     this.getUsers = this.getUsers.bind(this)
     this.suspendUser = this.suspendUser.bind(this)
     this.deleteUser = this.deleteUser.bind(this)
-      this.makeAdmin = this.makeAdmin.bind(this)
+    this.makeAdmin = this.makeAdmin.bind(this)
   }
 
   componentWillMount() {
@@ -97,20 +97,16 @@ class UserPage extends React.Component {
               fetch(`/api/users/${userID}`,
                   {method: "DELETE"})
                   .then(result => {
-                      console.log("deleted" + result.json()["_id"]);
-                      return result.json()
-                  }).then(data => {
-                      if (data._id) {
-                          location.reload()
-                      }
-              })
+                      location.reload()
+                      return result
+                  })
           } else {
               console.log("Deletn't yourself.\nNo self deletion here.\nGo to your own account to do that");
       }
   }
 
   makeAdmin(user) { // TODO: Merge this with suspend to flipFlag()
-    console.log("make admin::" + user._id);
+    console.log("make admin:" + user._id);
     if (user._id !== this.state.profile.sub) {
         fetch(`/api/users/${user._id}`, {
             method: 'PUT',
