@@ -13,9 +13,9 @@ import WatchListPage from './WatchListPage.jsx'
 import ShoppingCartPage from './ShoppingCartPage.jsx'
 import AdminMainPage from './AdminMain.jsx'
 import CheckoutPage from './CheckOut.jsx'
-import FlaggedItemsPage from './FlaggedItemsPage.jsx'
 import ContactPage from './ContactPage.jsx'
 import AdminSupportPage from './AdminSupportPage.jsx'
+import CategoryPage from './CategoryPage.jsx'
 
 class App extends React.Component {
   render() {
@@ -42,8 +42,8 @@ class App extends React.Component {
           <Route exact path="/checkout" render={(props) => <CheckoutPage auth={auth} {...props}/>} />
           <Route exact path="/admin/users" render={(props) => <UserPage auth={auth} {...props}/>} />
           <Route exact path="/admin/listings" render={(props) => <AdminMainPage auth={auth} {...props}/>} />
-          <Route exact path="/admin/flags" render={(props) => <FlaggedItemsPage auth={auth} {...props}/>} />
-          <Route exact path="/admin/support" render={(props) => <AdminSupportPage auth={auth} {...props}/>} />
+          <Route exact path="/admin/categories" render={(props) => <CategoryPage auth={auth} {...props}/>} />
+          <Route exact path="/admin/customersupport" render={(props) => <AdminSupportPage auth={auth} {...props}/>} />
           {/*
           <Route exact path="users/:user_id/buy_history" component={BuyHistoryPage}
           <Route exact path="users/:user_id/bid_history" component={BidHistoryPage}

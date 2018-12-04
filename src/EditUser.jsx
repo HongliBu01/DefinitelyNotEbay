@@ -15,7 +15,6 @@ import InputLabel from '@material-ui/core/InputLabel';
 
 // TODO: Sanitize inputs
 // TODO: Add functionality to suspend and delete account
-// TODO: Handle email change on Auth0
 class EditUser extends React.Component {
   constructor(props) {
     super(props);
@@ -66,23 +65,28 @@ class EditUser extends React.Component {
   };
 
   handleSubmit() {
-    const userID = this.state._id
-    fetch(`/api/users/${userID}`, {
-      method: 'PUT',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: this.state.email
-      })
-    }).then(results => {
-        return results.json()
-      }).then(data => {
-          if (data._id) {
-            this.setState({redirect: true})
-          }
-      });
+    const userID = this.state._id;
+    if (!userID.startsWith('auth0')) {
+        alert("You can't modify your email related to Google!")
+    } else {
+        fetch(`/api/users/${userID}`, {
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: this.state.email
+            })
+        }).then(results => {
+            return results.json()
+        }).then(data => {
+            if (data._id) {
+                this.props.auth.editUser(this.state)
+                this.setState({redirect: true})
+            }
+        });
+    }
   }
 
   suspendAccount() {
@@ -112,19 +116,14 @@ class EditUser extends React.Component {
     if (confirm("We are sorry to see you go...\nAre you sure you want to delete your account?")) {
         console.log("deleting " + userID);
         // TODO: does this redirects already?
+        this.props.auth.deleteUser(userID);
         this.props.auth.logout();
         // Call delete route
         fetch(`/api/users/${userID}`,
             {method: "DELETE"})
             .then(result => {
-                console.log("deleted" + result.json()["_id"]);
-                return result.json()
+                return result
             })
-        //     .then(data => {
-        //         if (data._id) {
-        //             this.setState({redirect: true})
-        //         }
-        // })
     } else {
         alert("Deleten't yourself.");
         console.log("Deleten't yourself.");
