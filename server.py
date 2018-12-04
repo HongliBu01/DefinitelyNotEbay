@@ -84,12 +84,32 @@ def handleUser(user_id):
 @app.route("/api/items", methods=['GET'])
 def findAllItems():
     items = []
-    # TODO: Check if time period has ended. If true, move item to last bidder's cart with type "bid" and mark not active
+	# Check if time period has ended. If true, move item to last bidder's cart with type "bid" and mark not active
     for item in mongo.db.items.find():
-        # If item endTime has past
-        # Check if item is sold
-        # Check length of bid_history. If it's greater than 0, then move it to winner's cart and mark as sold
-        items.append(item)
+        if "soldFlag" not in item:
+            mongo.db.items.find_one_and_update({"_id" : item["_id"]}, {"$set": {"soldFlag": False}})
+    for item in mongo.db.items.find():
+        endtime= datetime.datetime.strptime(item["endTime"], "%Y-%m-%dT%H:%M")
+        if item["soldFlag"] == False:
+            if endtime <= datetime.datetime.now():
+                bidLen = len(item["bid_history"])
+                if bidLen > 0:
+                    winnerID = item["bid_history"][bidLen - 1]["userID"]
+                    winnerPrice =  item["bid_history"][bidLen - 1]["bidPrice"]
+                    winner = mongo.db.users.find_one({"_id": winnerID})
+                    if "cart" not in winner:
+                        winner["cart"] = []
+                    alreadyInCart = False
+                    for itemInCart in mongo.db.users.find_one({"_id" : winnerID})["cart"]:
+                        if itemInCart["id"] ==  str(item["_id"]) or itemInCart["id"] ==  item["_id"]:
+                            alreadyInCart = True
+                            break
+                    if not alreadyInCart:
+                        winner["cart"].append({"_id" : str(item["_id"]), "price" : winnerPrice, "type" : "bid"})
+                        mongo.db.users.find_one_and_update({"_id": winnerID}, {"$set": {"cart": winner["cart"]}})
+                    mongo.db.items.find_one_and_update({"_id" : item["_id"]}, {"$set": {"soldFlag": True}})
+            else:
+                items.append(item)
     return json.dumps(items, default=json_util.default)
 
 @app.route("/api/items", methods=['POST'])
@@ -103,9 +123,28 @@ def createItem():
 def handleItem(item_id):
     if request.method == 'GET':
         itemData = mongo.db.items.find_one_or_404({"_id": ObjectId(item_id)})
-        # If item endTime has past
-        # Check if item is sold
-        # Check length of bid_history. If it's greater than 0, then move it to winner's cart and mark as sold
+        if "soldFlag" not in itemData:
+            mongo.db.items.find_one_and_update({"_id" : itemData["_id"]}, {"$set": {"soldFlag": False}})
+        endtime= datetime.datetime.strptime(itemData["endTime"], "%Y-%m-%dT%H:%M")
+        if itemData["soldFlag"] == False:
+            if endtime <= datetime.datetime.now():
+                bidLen = len(itemData["bid_history"])
+                if bidLen > 0:
+                    winnerID = itemData["bid_history"][bidLen - 1]["userID"]
+                    winnerPrice =  itemData["bid_history"][bidLen - 1]["bidPrice"]
+                    winner = mongo.db.users.find_one({"_id": winnerID})
+                    if "cart" not in winner:
+                        winner["cart"] = []
+                    alreadyInCart = False
+                    for itemInCart in mongo.db.users.find_one({"_id" : winnerID})["cart"]:
+                        if itemInCart["id"] ==  str(itemData["_id"]) or itemInCart["id"] ==  itemData["_id"]:
+                            alreadyInCart = True
+                            break
+                    if not alreadyInCart:
+                        winner["cart"].append({"_id" : str(itemData["_id"]), "price" : winnerPrice, "type" : "bid"})
+                        mongo.db.users.find_one_and_update({"_id": winnerID}, {"$set": {"cart": winner["cart"]}})
+                    mongo.db.items.find_one_and_update({"_id" : itemData["_id"]}, {"$set": {"soldFlag": True}})
+                    itemData["soldFlag"] = True
         return json.dumps(itemData, default=json_util.default)
 
     if request.method == 'PUT':
