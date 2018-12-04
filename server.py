@@ -283,7 +283,7 @@ def delete_watchlist_item(user_id, item_id):
 # Need to group them up.
 
 
-@app.route('/api/categories', methods=['GET', 'POST'])
+@app.route('/api/categories', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def categories():
     if request.method == 'GET':
         categories = mongo.db.misc.find_one_or_404({"name": "categories"})
@@ -295,6 +295,35 @@ def categories():
         current_categories["data"].append(category)
         res = mongo.db.misc.find_one_and_update({"name": "categories"}, {"$set": {"data": current_categories["data"]}})
         return json.dumps(res, default=json_util.default)
+    elif request.method == 'PUT':
+        category_data = request.get_json(force=True)
+        current_categories = mongo.db.misc.find_one_or_404({"name": "categories"})
+        old_category = category_data[0]
+        index = category_data[1]
+        new_category = category_data[2]
+        current_categories["data"][index] = new_category
+        # Update any items using those categories
+        for item in mongo.db.items.find():
+            if old_category in item["categories"]:
+                item["categories"].remove(old_category)
+                item["categories"].append(new_category)
+                mongo.db.items.find_one_and_update({"_id": ObjectId(item["_id"])}, {"$set": item})
+        res = mongo.db.misc.find_one_and_update({"name": "categories"}, {"$set": {"data": current_categories["data"]}})
+        return json.dumps(res, default=json_util.default)
+
+    else:
+        index = request.get_json(force=True)
+        current_categories = mongo.db.misc.find_one_or_404({"name": "categories"})
+        old_category = current_categories["data"].pop(index)
+        #Update any items using those categories
+        for item in mongo.db.items.find():
+            if old_category in item["categories"]:
+                item["categories"].remove(old_category)
+                mongo.db.items.find_one_and_update({"_id": ObjectId(item["_id"])}, {"$set": item})
+        res = mongo.db.misc.find_one_and_update({"name": "categories"}, {"$set": {"data": current_categories["data"]}})
+        return json.dumps(res, default=json_util.default)
+
+
 
 @app.route('/api/users/<user_id>/notifications', methods=['POST'])
 def notificationsRead(user_id):

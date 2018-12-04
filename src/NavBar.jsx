@@ -250,6 +250,7 @@ class PrimarySearchAppBar extends React.Component {
       >
         <MenuItem onClick={this.handleMenuClose}><Link exact to="/admin/users" style={{ textDecoration: 'none' }}>Manage Users</Link></MenuItem>
         <MenuItem onClick={this.handleMenuClose}><Link exact to="/admin/listings" style={{ textDecoration: 'none' }}>View All Listings</Link></MenuItem>
+        <MenuItem onClick={this.handleMenuClose}><Link exact to="/admin/categories" style={{ textDecoration: 'none' }}>Manage Categories</Link></MenuItem>
         <MenuItem onClick={this.handleMenuClose}><Link exact to="/admin/customersupport" style={{ textDecoration: 'none' }}>Customer Service</Link></MenuItem>
       </Menu>
     );
