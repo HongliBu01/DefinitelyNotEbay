@@ -214,6 +214,22 @@ def bid(item_id):
     return json.dumps(new_bid, default=json_util.default)
 
 
+# Get BID HISTORY (Similar to watchlist)
+@app.route('/api/users/<user_id>/bid_history', methods=['GET'])
+def bid_history(user_id):
+        bids = mongo.db.users.find_one({"_id": user_id})
+        bids = bids["bidHistory"]
+        if not bids:
+            return json.dumps(bids, default=json_util.default)
+        formatted_bids = {}
+        for single_bid in bids:
+            if single_bid["itemID"] in formatted_bids:
+                formatted_bids[single_bid["itemID"]] = formatted_bids[single_bid["itemID"]].append(single_bid["bidPrice"])
+            else:
+                formatted_bids[single_bid["itemID"]] = [single_bid["bidPrice"]]
+        return json.dumps(formatted_bids, default=json_util.default)
+
+
 # CART STUFF
 # TODO: Add edit functionality if it was buyNow type
 @app.route('/api/users/<user_id>/cart', methods=['GET', 'POST'])
