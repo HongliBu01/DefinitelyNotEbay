@@ -53,10 +53,22 @@ class MainPage extends React.Component {
     if (!userProfile) {
       getProfile((err, profile) => {
         this.setState({profile})
+        this.getUser(profile.sub)
       })
     } else {
       this.setState({ profile: userProfile })
+      this.getUser(userProfile.sub)
     }
+  }
+
+  getUser(userID) {
+    fetch(`/api/users/${userID}`)
+      .then(results => {
+        return results.json()
+      }).then(data => {
+        console.log(data)
+        this.setState({...data})
+    })
   }
 
   getItems() {
@@ -65,14 +77,17 @@ class MainPage extends React.Component {
         return results.json()
       }).then(data => {
           console.log(data)
-          var allItems = []
-          // Hide expired items
-          data.map((item) => {
-            if (moment(Date.now()).isBefore(moment(item.endTime)) && item.reportFlag) {
-              allItems.push(item)
-            }
-          })
-          this.setState({allItems: allItems})
+          data = data.filter((item) => item.reportFlag)
+          console.log(data)
+          // var allItems = []
+
+          // data.map((item) => {
+          //   // Hide expired items
+          //   if (moment(Date.now()).isBefore(moment(item.endTime)) && item.reportFlag) {
+          //     allItems.push(item)
+          //   }
+          // })
+          this.setState({allItems: data})
       });
   }
 
@@ -83,28 +98,6 @@ class MainPage extends React.Component {
       }).then(data => {
         this.setState({categories: data.data})
     })
-  }
-
-  getCart() {
-    // fetch('/api/users/5bdd060508ffae36201e3a79/cart') // TODO: URL Parsing, get correct userID
-      fetch('/api/users/google-oauth2|101445531905307187466/cart') //changed to use another id
-      .then(results => {
-        return results.json()
-      }).then(data => {
-        console.log(data)
-        this.setState({cartItems: data})
-      })
-  }
-
-  getWatchlist() {
-    fetch('/api/users/google-oauth2|101445531905307187466/watchlist') // TODO: URL Parsing
-    // changed to use another id, also from "cart" to "watchlist
-      .then(results => {
-        return results.json()
-      }).then(data => {
-        console.log(data)
-        this.setState({watchlistItems: data})
-      })
   }
 
   handleChange = name => event => {
@@ -150,6 +143,7 @@ class MainPage extends React.Component {
     // const {profile} = this.state
     return (
       <div>
+      {this.state.isAdmin ? <div>
       <InputLabel htmlFor="select-multiple-chip">Categories </InputLabel>
       <Select
         multiple
@@ -180,7 +174,7 @@ class MainPage extends React.Component {
       <div style={{margin: '10px'}}>
       {this.state.currentItems.length > 0 || this.state.selectedCategories.length > 0 ? this.state.currentItems.map((item, i) => <CardItem key={item._id.$oid} itemID={item._id.$oid ? item._id.$oid : item._id} />) : this.state.allItems.map((item, i) => <CardItem key={item._id.$oid} itemID={item._id.$oid ? item._id.$oid : item._id} />)}
       </div>
-      </div>
+      </div> : <p> You are not authorized to view this page </p>} </div>
     )
   }
 }

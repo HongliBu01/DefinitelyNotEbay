@@ -319,7 +319,7 @@ class ItemPage extends React.Component {
         {/*remove from watchlist*/}
         <Button variant="contained" onClick={()=>this.removeFromWatchlist()}>Remove from Watchlist</Button>
         <Button variant="contained" onClick={()=>this.reportItem()}>Report Item </Button>
-
+        {this.state.reportFlag && <p> This item has been reported </p>}
         <p>
         {this.state.profile && this.state.seller === this.state.profile.sub && <Button variant="contained" onClick={()=>this.toggleEdit()}> Edit Listing </Button>}
          {this.state.canEdit &&
