@@ -38,8 +38,10 @@ class ItemPage extends React.Component {
       redirectToCart: false,
       redirectToMain: false,
       canEdit: false,
-      isActive: false
+      isActive: false,
+      isAdmin: false
     }
+    this.getUser = this.getUser.bind(this)
     this.getItem = this.getItem.bind(this)
     this.handleChange = this.handleChange.bind(this)
     this.handleBidChange = this.handleBidChange.bind(this)
@@ -54,6 +56,7 @@ class ItemPage extends React.Component {
     this.socketBid = this.socketBid.bind(this)
     this.socketUpdateBid = this.socketUpdateBid.bind(this)
     this.removeFromWatchlist = this.removeFromWatchlist.bind(this)
+    this.endAuction = this.endAuction.bind(this)
   }
 
   componentWillMount() {
@@ -61,10 +64,12 @@ class ItemPage extends React.Component {
     const { userProfile, getProfile } = this.props.auth
     if (!userProfile) {
       getProfile((err, profile) => {
-        this.setState({profile})
+        this.setState({profile});
+        this.getUser(profile.sub)
       })
     } else {
-      this.setState({ profile: userProfile })
+      this.setState({ profile: userProfile });
+      this.getUser(userProfile.sub)
     }
 
     connect('bid',(message) => this.socketUpdateBid(message))
@@ -83,6 +88,17 @@ class ItemPage extends React.Component {
         itemID: this.state.itemID
       })
     emit('bid', data)
+  }
+
+  //Get user from Profile.jsx
+  getUser(userID) {
+    fetch(`/api/users/${userID}`)
+      .then(results => {
+        return results.json()
+      }).then(data => {
+        console.log(data);
+        this.setState({isAdmin: data.isAdmin})
+    })
   }
 
   getItem() {
@@ -252,6 +268,26 @@ class ItemPage extends React.Component {
     this.setState({canEdit: !this.state.canEdit})
   }
 
+  endAuction(){
+    const itemID = this.state.itemID;
+    fetch(`/api/items/${itemID}`, {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+          endTime: new Date()
+      })
+    }).then(result => {
+      return result.json()
+    }).then(data => {
+      if (data._id){
+        location.reload()
+      }
+    })
+  }
+
   render() {
     if (this.state.redirectToCart) {
       return <Redirect push to={`/cart`} />;
@@ -306,7 +342,7 @@ class ItemPage extends React.Component {
         <Button variant="contained" onClick={()=>this.removeFromWatchlist()}>Remove from Watchlist</Button>
         <Button variant="contained" onClick={()=>this.reportItem()}>Report Item </Button>
 
-        <p>
+        <div>
         {this.state.profile && this.state.seller === this.state.profile.sub && <Button variant="contained" onClick={()=>this.toggleEdit()}> Edit Listing </Button>}
          {this.state.canEdit &&
             <p>
@@ -348,7 +384,22 @@ class ItemPage extends React.Component {
             }
             </p>
         }
-      </p>
+      </div>
+      <div>
+        {this.state.isAdmin &&
+          <div>Admin operations:
+            <div>
+                {this.state.bid_history ?
+                    <Button variant="contained" disabled> Delete (Disabled for having bids)</Button> :
+                    <Button variant="contained" onClick={() => this.deleteItem()}> Delete </Button>
+                }
+
+
+                <Button variant="contained" onClick={() => this.endAuction()}>Suspend Auction</Button>
+            </div>
+          </div>
+        }
+      </div>
       </div>
     }
       </div>
