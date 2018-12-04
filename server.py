@@ -95,13 +95,13 @@ def findAllItems():
                 bidLen = len(item["bid_history"])
                 if bidLen > 0:
                     winnerID = item["bid_history"][bidLen - 1]["userID"]
-                    winnerPrice =  item["bid_history"][bidLen - 1]["bidPrice"]
+                    winnerPrice =  float(item["bid_history"][bidLen - 1]["bidPrice"])
                     winner = mongo.db.users.find_one({"_id": winnerID})
                     if "cart" not in winner:
                         winner["cart"] = []
                     alreadyInCart = False
                     for itemInCart in mongo.db.users.find_one({"_id" : winnerID})["cart"]:
-                        if itemInCart["id"] ==  str(item["_id"]) or itemInCart["id"] ==  item["_id"]:
+                        if itemInCart["_id"] ==  str(item["_id"]) or itemInCart["_id"] ==  item["_id"]:
                             alreadyInCart = True
                             break
                     if not alreadyInCart:
@@ -131,13 +131,13 @@ def handleItem(item_id):
                 bidLen = len(itemData["bid_history"])
                 if bidLen > 0:
                     winnerID = itemData["bid_history"][bidLen - 1]["userID"]
-                    winnerPrice =  itemData["bid_history"][bidLen - 1]["bidPrice"]
+                    winnerPrice =  float(itemData["bid_history"][bidLen - 1]["bidPrice"])
                     winner = mongo.db.users.find_one({"_id": winnerID})
                     if "cart" not in winner:
                         winner["cart"] = []
                     alreadyInCart = False
                     for itemInCart in mongo.db.users.find_one({"_id" : winnerID})["cart"]:
-                        if itemInCart["id"] ==  str(itemData["_id"]) or itemInCart["id"] ==  itemData["_id"]:
+                        if itemInCart["_id"] ==  str(itemData["_id"]) or itemInCart["_id"] ==  itemData["_id"]:
                             alreadyInCart = True
                             break
                     if not alreadyInCart:
