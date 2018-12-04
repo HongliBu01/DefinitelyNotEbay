@@ -84,9 +84,32 @@ def handleUser(user_id):
 @app.route("/api/items", methods=['GET'])
 def findAllItems():
     items = []
-    # TODO: Check if time period has ended. If true, move item to last bidder's cart with type "bid" and mark not active
+	# Check if time period has ended. If true, move item to last bidder's cart with type "bid" and mark not active
     for item in mongo.db.items.find():
-        items.append(item)
+        if "soldFlag" not in item:
+            mongo.db.items.find_one_and_update({"_id" : item["_id"]}, {"$set": {"soldFlag": False}})
+    for item in mongo.db.items.find():
+        endtime= datetime.datetime.strptime(item["endTime"], "%Y-%m-%dT%H:%M")
+        if item["soldFlag"] == False:
+            if endtime <= datetime.datetime.now():
+                bidLen = len(item["bid_history"])
+                if bidLen > 0:
+                    winnerID = item["bid_history"][bidLen - 1]["userID"]
+                    winnerPrice =  item["bid_history"][bidLen - 1]["bidPrice"]
+                    winner = mongo.db.users.find_one({"_id": winnerID})
+                    if "cart" not in winner:
+                        winner["cart"] = []
+                    alreadyInCart = False
+                    for itemInCart in mongo.db.users.find_one({"_id" : winnerID})["cart"]:
+                        if itemInCart["id"] ==  str(item["_id"]) or itemInCart["id"] ==  item["_id"]:
+                            alreadyInCart = True
+                            break
+                    if not alreadyInCart:
+                        winner["cart"].append({"_id" : str(item["_id"]), "price" : winnerPrice, "type" : "bid"})
+                        mongo.db.users.find_one_and_update({"_id": winnerID}, {"$set": {"cart": winner["cart"]}})
+                    mongo.db.items.find_one_and_update({"_id" : item["_id"]}, {"$set": {"soldFlag": True}})
+            else:
+                items.append(item)
     return json.dumps(items, default=json_util.default)
 
 @app.route("/api/items", methods=['POST'])
@@ -100,6 +123,9 @@ def createItem():
 def handleItem(item_id):
     if request.method == 'GET':
         itemData = mongo.db.items.find_one_or_404({"_id": ObjectId(item_id)})
+        # If item endTime has past
+        # Check if item is sold
+        # Check length of bid_history. If it's greater than 0, then move it to winner's cart and mark as sold
         return json.dumps(itemData, default=json_util.default)
 
     if request.method == 'PUT':
@@ -146,6 +172,33 @@ def cart(user_id):
             user["cart"].append(new_cart_item)
         res = mongo.db.users.find_one_and_update({"_id": user_id}, {"$set": {"cart": user["cart"]}})
         return json.dumps(res, default=json_util.default)
+
+@app.route('/api/users/<user_id>/checkout', methods=['POST'])
+def checkout(user_id):
+    user = mongo.db.users.find_one({"_id": user_id})
+    # Store cart in buyHistory
+    cart = user["cart"]
+    timestamp = time.time() * 1000
+    new_buy = {"timestamp" : timestamp, "items" : cart}
+    if "buyHistory" not in user:
+        user["buyHistory"] = [new_buy]
+    else:
+        user["buyHistory"].append(new_buy)
+
+    mongo.db.users.find_one_and_update({"_id" : user_id}, {"$set" : user})
+
+    #flag items
+    for i in cart:
+        item = mongo.db.items.find_one({"_id" : ObjectId(i["_id"])})
+        item["soldFlag"] = True
+        mongo.db.items.find_one_and_update({"_id" : ObjectId(i["_id"])}, {"$set" : item})
+        # Go through all users, check if item is in their cart, if so, remove
+        mongo.db.users.update({},{ "$pull": { "cart": { "_id" : i["_id"] } } }, multi= True)
+
+    # Clear cart
+    user["cart"] = []
+    res = mongo.db.users.find_one_and_update({"_id": user_id}, {"$set" : user})
+    return json.dumps(res, default=json_util.default)
 
 
 # WATCHLIST
