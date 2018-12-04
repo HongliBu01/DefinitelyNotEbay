@@ -55,7 +55,7 @@ class ItemPage extends React.Component {
     this.toggleEdit = this.toggleEdit.bind(this)
     this.socketBid = this.socketBid.bind(this)
     this.socketUpdateBid = this.socketUpdateBid.bind(this)
-    this.removeFromWatchlist = this.removeFromWatchlist.bind(this)
+    // this.removeFromWatchlist = this.removeFromWatchlist.bind(this)
     this.endAuction = this.endAuction.bind(this)
   }
 
@@ -206,22 +206,22 @@ class ItemPage extends React.Component {
     })
   }
 
-  removeFromWatchlist() {
-        const itemID = this.state.itemID;
-        const userID = this.state.profile.sub;
-        this.setState({itemID: itemID,
-                             userID: userID});
-        fetch(`/api/users/${userID}/watchlist/${itemID}`,
-            {method: "DELETE",})
-            .then(results => {
-                return results.json() // route definition says its the user object (server.py: 157)
-            }).then(data => {
-                this.setState({...data})
-                console.log(data)
-                location.reload()
-                // refresh page was intended to make watchlist have new state. but may not necessary here.
-        })
-    }
+  // removeFromWatchlist() {
+  //       const itemID = this.state.itemID;
+  //       const userID = this.state.profile.sub;
+  //       this.setState({itemID: itemID,
+  //                            userID: userID});
+  //       fetch(`/api/users/${userID}/watchlist/${itemID}`,
+  //           {method: "DELETE",})
+  //           .then(results => {
+  //               return results.json() // route definition says its the user object (server.py: 157)
+  //           }).then(data => {
+  //               this.setState({...data})
+  //               console.log(data)
+  //               location.reload()
+  //               // refresh page was intended to make watchlist have new state. but may not necessary here.
+  //       })
+  //   }
 
   reportItem() {
     const itemID = this.state.itemID;
@@ -353,7 +353,7 @@ class ItemPage extends React.Component {
         <br />
         <Button variant="contained" onClick={()=>this.addToWatchlist()}>Add to Watchlist </Button>
         {/*remove from watchlist*/}
-        <Button variant="contained" onClick={()=>this.removeFromWatchlist()}>Remove from Watchlist</Button>
+        {/*<Button variant="contained" onClick={()=>this.removeFromWatchlist()}>Remove from Watchlist</Button>*/}
         <Button variant="contained" onClick={()=>this.reportItem()}>Report Item </Button>
           {this.state.reportFlag && <p> This item has been reported </p>}
         <div>
