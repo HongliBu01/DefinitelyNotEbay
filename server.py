@@ -140,8 +140,7 @@ def findAllItems():
                         winner["cart"].append({"_id" : str(item["_id"]), "price" : winnerPrice, "type" : "bid"})
                         mongo.db.users.find_one_and_update({"_id": winnerID}, {"$set": {"cart": winner["cart"]}})
                     mongo.db.items.find_one_and_update({"_id" : item["_id"]}, {"$set": {"soldFlag": True}})
-            else:
-                items.append(item)
+        items.append(item)
     return json.dumps(items, default=json_util.default)
 
 @app.route("/api/items", methods=['POST'])
