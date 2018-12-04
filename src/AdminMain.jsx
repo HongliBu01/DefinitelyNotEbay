@@ -102,7 +102,7 @@ class MainPage extends React.Component {
 
 
   filterActive(activeType) {
-    const otherFilters = (this.state.flagged !== "all") || (this.state.startDate !== "" || this.state.endDate !== "")
+    const otherFilters = (this.state.filterFlag !== "all") || (this.state.startDate !== "" || this.state.endDate !== "")
     // Filter by active
     var currentItems = []
     if (activeType === "active_only") {
@@ -175,29 +175,34 @@ class MainPage extends React.Component {
 
   filterTimeframe(timeframe, timeType) {
     // Filter by timeframe
+    var startDate = ""
+    var endDate = ""
     if (timeType === "start") {
       this.setState({startDate: timeframe})
+      startDate = timeframe
     } else {
+      endDate = timeframe
       this.setState({endDate: timeframe})
     }
     var currentItems = []
     if (this.state.selectActive !== "all") {
       this.state.currentItems.map((item) => {
-        if (this.state.startDate !== "" && this.state.endDate !== "" && moment(item.endTime).isSameOrBefore(moment(this.state.endDate)) && moment(item.startTime).isSameOrAfter(moment(this.state.startDate))) {
+        console.log(startDate, item.startTime, endDate, item.endTime)
+        if (startDate !== "" && endDate !== "" && moment(item.endTime).isSameOrBefore(moment(endDate)) && moment(item.startTime).isSameOrAfter(moment(startDate))) {
           currentItems.push(item)
-        } else if (this.state.startDate !== "" && moment(item.startTime).isSameOrAfter(moment(this.state.startDate))) {
+        } else if (startDate !== "" && moment(item.startTime).isSameOrAfter(moment(startDate))) {
           currentItems.push(item)
-        } else if (this.state.endDate !== "" && moment(item.endTime).isSameOrBefore(moment(this.state.endDate))) {
+        } else if (endDate !== "" && moment(item.endTime).isSameOrBefore(moment(endDate))) {
           currentItems.push(item)
         }
       })
     } else {
       this.state.allItems.map((item) => {
-        if (this.state.startDate !== "" && this.state.endDate !== "" && moment(item.endTime).isSameOrBefore(moment(this.state.endDate)) && moment(item.startTime).isSameOrAfter(moment(this.state.startDate))) {
+        if (startDate !== "" && endDate !== "" && moment(item.endTime).isSameOrBefore(moment(endDate)) && moment(item.startTime).isSameOrAfter(moment(startDate))) {
           currentItems.push(item)
-        } else if (this.state.startDate !== "" && moment(item.startTime).isSameOrAfter(moment(this.state.startDate))) {
+        } else if (startDate !== "" && moment(item.startTime).isSameOrAfter(moment(startDate))) {
           currentItems.push(item)
-        } else if (this.state.endDate !== "" && moment(item.endTime).isSameOrBefore(moment(this.state.endDate))) {
+        } else if (endDate !== "" && moment(item.endTime).isSameOrBefore(moment(endDate))) {
           currentItems.push(item)
         }
       })
