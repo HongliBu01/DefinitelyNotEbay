@@ -88,6 +88,7 @@ class MainPage extends React.Component {
       }).then(data => {
           data.sort(function(a, b){return moment(a.endTime).isBefore(moment(b.endTime)) ? -1 : 1})
           this.setState({allItems: data})
+          console.log(data)
       });
   }
 
@@ -101,11 +102,11 @@ class MainPage extends React.Component {
   }
 
 
-  filterActive(activeType) {
+  filterActive(selectActive) {
     const otherFilters = (this.state.filterFlag !== "all") || (this.state.startDate !== "" || this.state.endDate !== "")
     // Filter by active
     var currentItems = []
-    if (activeType === "active_only") {
+    if (selectActive === "active_only") {
       if (otherFilters) {
         this.state.currentItems.map((item) => {
         if (moment(Date.now()).isBefore(moment(item.endTime))) {
@@ -119,22 +120,40 @@ class MainPage extends React.Component {
         }
       })
       }
-    } else if (activeType === "all") {
+    } else if (selectActive === "all") {
       // Do nothing
-    } else if (activeType === "inactive_only") {
+    } else if (selectActive === "inactive_only") {
       // Inactive only
-      this.state.allItems.map((item) => {
+      if (otherFilters) {
+        this.state.currentItems.map((item) => {
         if (moment(Date.now()).isAfter(moment(item.endTime))) {
           currentItems.push(item)
         }
       })
+      } else {
+        this.state.allItems.map((item) => {
+        if (moment(Date.now()).isAfter(moment(item.endTime))) {
+          currentItems.push(item)
+        }
+      })
+      }
+
     } else {
       // Sold only
-      this.state.allItems.map((item) => {
+      if (otherFilters) {
+        this.state.currentItems.map((item) => {
         if (item.soldFlag) {
           currentItems.push(item)
         }
       })
+      } else {
+        this.state.allItems.map((item) => {
+        if (item.soldFlag) {
+          currentItems.push(item)
+        }
+      })
+      }
+
     }
     this.setState({currentItems})
 
