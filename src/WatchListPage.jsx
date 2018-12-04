@@ -59,7 +59,7 @@ class WatchListPage extends React.Component {
       }).then(data => {
         //POST
         var watchlist = this.state.watchlist
-        watchlist.splice(index, 1)
+        var deleted = watchlist.splice(index, 1)
         this.setState({watchlist})
       });
   }

@@ -140,8 +140,7 @@ def findAllItems():
                         winner["cart"].append({"_id" : str(item["_id"]), "price" : winnerPrice, "type" : "bid"})
                         mongo.db.users.find_one_and_update({"_id": winnerID}, {"$set": {"cart": winner["cart"]}})
                     mongo.db.items.find_one_and_update({"_id" : item["_id"]}, {"$set": {"soldFlag": True}})
-            else:
-                items.append(item)
+        items.append(item)
     return json.dumps(items, default=json_util.default)
 
 @app.route("/api/items", methods=['POST'])
@@ -296,10 +295,13 @@ def watchlist(user_id):
         return json.dumps(res, default=json_util.default)
     elif request.method == 'DELETE':
         delete_watchlist_item = request.get_json(force=True)
+
         user = mongo.db.users.find_one({"_id": user_id})
+
         for i in range(len(user["watchlist"])):
-            if user["watchlist"][i] == delete_watchlist_item:
-                user["watchlist"].pop(int(i))
+            if user["watchlist"][i]["_id"] == delete_watchlist_item:
+                user["watchlist"].pop(i)
+                break
         res = mongo.db.users.find_one_and_update({"_id": user_id}, {"$set": {"watchlist": user["watchlist"]}})
         return json.dumps(res, default=json_util.default)
 
