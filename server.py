@@ -278,7 +278,7 @@ def checkout(user_id):
 
 
 # WATCHLIST
-@app.route('/api/users/<user_id>/watchlist', methods=['GET', 'POST'])
+@app.route('/api/users/<user_id>/watchlist', methods=['GET', 'POST', 'DELETE'])
 def watchlist(user_id):
     if request.method == 'GET':
         watchlist = mongo.db.users.find_one({"_id": user_id})['watchlist']
@@ -292,6 +292,14 @@ def watchlist(user_id):
         else:
             if new_watchlist_item not in user["watchlist"]: # can't add same item to watchlist again
                 user["watchlist"].append(new_watchlist_item)
+        res = mongo.db.users.find_one_and_update({"_id": user_id}, {"$set": {"watchlist": user["watchlist"]}})
+        return json.dumps(res, default=json_util.default)
+    elif request.method == 'DELETE':
+        delete_watchlist_item = request.get_json(force=True)
+        user = mongo.db.users.find_one({"_id": user_id})
+        for i in range(len(user["watchlist"])):
+            if user["watchlist"][i] == delete_watchlist_item:
+                user["watchlist"].pop(int(i))
         res = mongo.db.users.find_one_and_update({"_id": user_id}, {"$set": {"watchlist": user["watchlist"]}})
         return json.dumps(res, default=json_util.default)
 
@@ -339,7 +347,7 @@ def categories():
         res = mongo.db.misc.find_one_and_update({"name": "categories"}, {"$set": {"data": current_categories["data"]}})
         return json.dumps(res, default=json_util.default)
 
-    else:
+    elif request.method == 'DELETE':
         index = request.get_json(force=True)
         current_categories = mongo.db.misc.find_one_or_404({"name": "categories"})
         old_category = current_categories["data"].pop(index)
