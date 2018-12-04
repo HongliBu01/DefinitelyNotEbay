@@ -116,7 +116,7 @@ def findAllItems():
             mongo.db.items.find_one_and_update({"_id" : item["_id"]}, {"$set": {"soldFlag": False}})
     for item in mongo.db.items.find():
         endTimeStr = item["endTime"].split(".")[0]
-        if len(endTimeStr.split(":")) == 2: 
+        if len(endTimeStr.split(":")) == 2:
             endtime = datetime.datetime.strptime(endTimeStr, "%Y-%m-%dT%H:%M")
         elif len(endTimeStr.split(":")) == 3:
             endtime = datetime.datetime.strptime(endTimeStr, "%Y-%m-%dT%H:%M:%S")
@@ -150,7 +150,7 @@ def createItem():
     mongo.db.items.insert_one(itemData)
     # Store in user's listings
     seller = mongo.db.users.find_one({"_id": itemData['seller']})
-    seller["listing"].append(itemData['_id']['$oid'])
+    seller["listings"].append(itemData['_id'])
     mongo.db.users.find_one_and_update({"_id": itemData['seller']}, {"$set": seller})
     return json.dumps(itemData, default=json_util.default)
 
@@ -161,7 +161,7 @@ def handleItem(item_id):
         if "soldFlag" not in itemData:
             mongo.db.items.find_one_and_update({"_id" : itemData["_id"]}, {"$set": {"soldFlag": False}})
         endTimeStr = itemData["endTime"].split(".")[0]
-        if len(endTimeStr.split(":")) == 2: 
+        if len(endTimeStr.split(":")) == 2:
             endtime = datetime.datetime.strptime(endTimeStr, "%Y-%m-%dT%H:%M")
         elif len(endTimeStr.split(":")) == 3:
             endtime = datetime.datetime.strptime(endTimeStr, "%Y-%m-%dT%H:%M:%S")
