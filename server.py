@@ -16,6 +16,7 @@ import os
 import json
 import datetime, time
 import config
+import requests
 from bson.objectid import ObjectId
 from bson import json_util
 from flask import Flask, render_template, request
@@ -46,6 +47,17 @@ mongo = PyMongo(app)
 def index():
     return render_template('index.html')
 
+
+@app.route('/api/token', methods=['GET'])
+def getToken():
+    url = config.AUTH_CONFIG['tokenUrl']
+    payload = config.AUTH_CONFIG['tokenPayload']
+    headers = {'content-type': "application/json"}
+    res = requests.post(url, data=payload, headers=headers)
+    data = json.loads(res.text)
+    # print('***', data)
+    # print(data['access_token'])
+    return json.dumps(data, default=json_util.default)
 
 # USER STUFF
 @app.route('/api/users', methods=['GET'])

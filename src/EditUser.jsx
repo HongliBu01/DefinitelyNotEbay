@@ -79,6 +79,7 @@ class EditUser extends React.Component {
         return results.json()
       }).then(data => {
           if (data._id) {
+            this.props.auth.editUser(this.state)
             this.setState({redirect: true})
           }
       });

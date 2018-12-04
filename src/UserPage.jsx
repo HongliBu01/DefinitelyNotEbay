@@ -94,6 +94,7 @@ class UserPage extends React.Component {
       if (userID !== this.state.profile.sub) {
           console.log("deleting " + userID)
           // TODO: Pop a confirmation?
+          this.props.auth.deleteUser(userID)
           fetch(`/api/users/${userID}`,
               {method: "DELETE"})
               .then(result => {
