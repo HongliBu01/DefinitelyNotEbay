@@ -129,7 +129,10 @@ def findAllItems():
 def createItem():
     itemData = request.get_json(force=True)
     mongo.db.items.insert_one(itemData)
-    # TODO: append _id.$oid into itemData.seller's listings
+    # Store in user's listings
+    seller = mongo.db.users.find_one({"_id": itemData['seller']})
+    seller["listing"].append(itemData['_id']['$oid'])
+    mongo.db.users.find_one_and_update({"_id": itemData['seller']}, {"$set": seller})
     return json.dumps(itemData, default=json_util.default)
 
 @app.route("/api/items/<item_id>", methods=['GET', 'PUT', 'DELETE'])
@@ -171,7 +174,7 @@ def handleItem(item_id):
         print(res)
 
 
-# BID STUFF
+# BID STUFF. No longer used because replaced with socket
 @app.route('/api/items/<item_id>/bid', methods=['POST'])
 def bid(item_id):
     new_bid = request.get_json(force=True)
@@ -289,6 +292,18 @@ def notificationsRead(user_id):
     user["notifications"] = notifications
     mongo.db.users.find_one_and_update({"_id": user_id}, {"$set": user})
     return json.dumps(notifications, default=json_util.default)
+
+@app.route('/api/feedback', methods=['GET','POST'])
+def handle_feedback():
+    if request.method == 'GET':
+        feedbacks = []
+        for feedback in mongo.db.feedback.find():
+            feedbacks.append(feedback)
+        return json.dumps(feedbacks, default=json_util.default)
+    else:
+        feedback = request.get_json(force=True)
+        mongo.db.feedback.insert_one(feedback)
+        return json.dumps(feedback, default=json_util.default)
 
 @socketio.on('bid')
 def handle_bid(bid):

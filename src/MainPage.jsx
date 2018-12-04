@@ -35,7 +35,8 @@ class MainPage extends React.Component {
       categories: [],
       selectedCategories: [],
       search: "",
-      profile: {}
+      profile: {},
+      sortType: 'recentSort'
     };
 
     this.getItems = this.getItems.bind(this)
@@ -43,6 +44,7 @@ class MainPage extends React.Component {
     this.filterCategory = this.filterCategory.bind(this)
     this.handleChange = this.handleChange.bind(this)
     this.searchItems = this.searchItems.bind(this)
+    this.endSort = this.endSort.bind(this)
   }
 
   componentWillMount() {
@@ -72,6 +74,7 @@ class MainPage extends React.Component {
               allItems.push(item)
             }
           })
+          allItems.sort(function(a, b){return moment(a.endTime).isBefore(moment(b.endTime)) ? -1 : 1})
           this.setState({allItems: allItems})
       });
   }
@@ -107,6 +110,18 @@ class MainPage extends React.Component {
       })
   }
 
+  endSort(sortType) {
+    if (sortType === 'recentSort') {
+      var allItems = this.state.allItems
+      allItems.sort(function(a, b){return moment(a.endTime).isBefore(moment(b.endTime)) ? -1 : 1})
+      this.setState({allItems})
+    } else {
+      var allItems = this.state.allItems
+      allItems.sort(function(a, b){return moment(a.endTime).isBefore(moment(b.endTime)) ? 1 : -1})
+      this.setState({allItems})
+    }
+  }
+
   handleChange = name => event => {
     this.setState({
       [name]: event.target.value,
@@ -116,6 +131,9 @@ class MainPage extends React.Component {
     }
     if (name === "search") {
       this.searchItems(event.target.value)
+    }
+    if (name === "listingSort") {
+      this.endSort(event.target.value)
     }
   }
 
@@ -169,6 +187,13 @@ class MainPage extends React.Component {
           <MenuItem key={name} value={name}> {name}
           </MenuItem>
         ))}
+      </Select>
+      <Select
+        value={this.state.sortType}
+        onChange={this.handleChange("listingSort")}
+      >
+      <MenuItem key={'recentSort'} value={'recentSort'}> Most Recent </MenuItem>
+      <MenuItem key={'oldestSort'} value={'oldestSort'}> Oldest </MenuItem>
       </Select>
       <TextField
           id="standard-search"
