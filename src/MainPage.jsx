@@ -70,8 +70,10 @@ class MainPage extends React.Component {
           var allItems = []
           // Hide expired items
           data.map((item) => {
-            if (moment(Date.now()).isBefore(moment(item.endTime))) {
+            if (!item.soldFlag) {
+              if (moment(Date.now()).isBefore(moment(item.endTime))) {
               allItems.push(item)
+              }
             }
           })
           allItems.sort(function(a, b){return moment(a.endTime).isBefore(moment(b.endTime)) ? -1 : 1})
