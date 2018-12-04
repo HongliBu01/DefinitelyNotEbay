@@ -16,6 +16,7 @@ import CheckoutPage from './CheckOut.jsx'
 import ContactPage from './ContactPage.jsx'
 import AdminSupportPage from './AdminSupportPage.jsx'
 import CategoryPage from './CategoryPage.jsx'
+import BidHistoryPage from './BidHistoryPage.jsx'
 import BuyHistory from './BuyHistory.jsx'
 
 class App extends React.Component {
@@ -39,6 +40,7 @@ class App extends React.Component {
           <Route exact path="/contact" render={(props) => <ContactPage auth={auth} {...props} />} />
           <Route exact path="/watchlist" render={(props) => <WatchListPage auth={auth} {...props}/>} />
           <Route exact path="/account" render={(props) => <EditUser auth={auth} {...props}/>} />
+          <Route exact path="/bid_history" render={(props) => <BidHistoryPage auth={auth} {...props}/>} />
           <Route exact path="/cart" render={(props) => <ShoppingCartPage auth={auth} {...props}/>} />
           <Route exact path="/checkout" render={(props) => <CheckoutPage auth={auth} {...props}/>} />
           <Route exact path="/admin/users" render={(props) => <UserPage auth={auth} {...props}/>} />
