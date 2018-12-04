@@ -64,10 +64,9 @@ class Profile extends React.Component {
         <p> Active: {String(this.state.isActive)} </p>
         <p> <Link to={`/watchlist`}> Watchlist </Link> </p>
         <p> <Link to={`/cart`}> Cart </Link> </p>
-        <p> <Link to={`/users/${this.state._id}/buy_history`}> Past Purchases </Link> </p>
         <p> <Link to={`/bid_history`}> Past Bids </Link></p>
+        <p> <Link to={`/buyHistory`}> Past Purchases </Link> </p>
         <p> <Link to={`/users/${this.state._id}/item_history`}> Your Item Listings </Link></p>
-
         <h1> My Account </h1>
         <p> <Link to={`/users/${this.state._id}/account`}> Edit Account Details </Link></p></div> :
         <p> Please log in to view this page. </p>}

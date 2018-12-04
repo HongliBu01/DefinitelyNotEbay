@@ -46,11 +46,10 @@ class WatchListPage extends React.Component {
   render() {
     return (
       <div>
-          <Typography component="h2" variant="h1" gutterBottom>
-              This is your Watchlist:
-          </Typography>
-          {this.state.watchlist.map((item, i) => <CardItem showBought={true} itemID={item._id}/>)}
-
+          <h2> Watchlist </h2>
+          {this.state.watchlist.length === 0 ? <p> Nothing in watchlist </p> :
+          <div>{this.state.watchlist.map((item, i) => <CardItem showBought={true} itemID={item._id}/>)}</div>
+        }
       </div>
     )
   }
